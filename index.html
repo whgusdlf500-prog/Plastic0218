@@ -1,14 +1,1898 @@
 <!doctype html>
-<html lang="en">
+<html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hello World</title>
-  <link href='/style.css' rel='stylesheet'>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>AI뷰티시뮬레이터 — 더 티 나게 (Before/After 슬라이더)</title>
+  <meta name="description" content="내 사진으로 눈/코/입/윤곽 워프 + 컨투어/하이라이트/아이라인/립/블러셔 + 헤어스타일(앞머리/단발/장발) 오버레이까지. Before/After 드래그 슬라이더로 확 체감." />
+  <style>
+    :root{
+      --bg:#070A14;
+      --line: rgba(255,255,255,.14);
+      --text:#EAF0FF;
+      --sub:#AAB6D6;
+      --good:#35F0B5;
+      --mid:#6D7CFF;
+      --gold:#FFD36E;
+      --shadow: 0 18px 55px rgba(0,0,0,.50);
+      --r:20px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Apple SD Gothic Neo", "Noto Sans KR", Arial;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 720px at 18% 0%, rgba(109,124,255,.22), transparent 60%),
+        radial-gradient(900px 650px at 90% 10%, rgba(53,240,181,.16), transparent 55%),
+        radial-gradient(900px 650px at 55% 115%, rgba(255,211,110,.10), transparent 55%),
+        linear-gradient(180deg, var(--bg), #030411 78%);
+      overflow-x:hidden;
+    }
+    .wrap{max-width:1250px;margin:0 auto;padding:18px 16px 34px;}
+    .topbar{
+      display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
+      padding:14px 14px;
+      border:1px solid var(--line);
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+      border-radius: var(--r);
+      box-shadow: var(--shadow);
+    }
+    .brand{display:flex;align-items:center;gap:12px;flex:1;min-width:280px}
+    .logo{
+      width:44px;height:44px;border-radius:14px;
+      background: conic-gradient(from 210deg, rgba(109,124,255,.95), rgba(53,240,181,.90), rgba(255,211,110,.88), rgba(109,124,255,.95));
+      box-shadow: 0 12px 30px rgba(109,124,255,.22);
+      position:relative;
+    }
+    .logo:after{
+      content:"";position:absolute;inset:9px;border-radius:12px;
+      background: rgba(8,10,20,.78);
+      border:1px solid rgba(255,255,255,.10);
+    }
+    h1{margin:0;font-size:16px;letter-spacing:-.02em}
+    .sub{color:var(--sub);font-size:12px;line-height:1.55;margin-top:4px}
+    .grid{margin-top:14px;display:grid;gap:14px;grid-template-columns: 1.25fr .75fr;}
+    @media (max-width: 980px){ .grid{grid-template-columns:1fr;} }
+    .card{
+      border:1px solid var(--line);
+      background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.03));
+      border-radius: var(--r);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .hd{
+      padding:14px 14px 10px;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;
+      background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.00));
+    }
+    .title{font-weight:950;font-size:13px;letter-spacing:-.01em}
+    .hint{color:var(--sub);font-size:12px;margin-top:6px;line-height:1.55}
+    .bd{padding:14px;}
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .langWrap{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 10px;
+      border:1px solid rgba(255,255,255,.12);
+      border-radius: 14px;
+      background: rgba(255,255,255,.05);
+    }
+    .langSelect{
+      min-width:130px;
+      width:auto;
+      padding:8px 10px;
+      border-radius:10px;
+      font-size:12px;
+    }
+    .btn{
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      padding:10px 12px;
+      border-radius: 14px;
+      font-weight:900;
+      cursor:pointer;
+      transition:.15s transform,.15s background,.15s border-color;
+      user-select:none;
+      white-space:nowrap;
+    }
+    .btn:hover{transform: translateY(-1px); background: rgba(255,255,255,.10); border-color: rgba(255,255,255,.22); }
+    .btn.primary{ background: linear-gradient(90deg, rgba(109,124,255,.28), rgba(53,240,181,.18)); border-color: rgba(109,124,255,.55); }
+    .btn.gold{ background: linear-gradient(90deg, rgba(255,211,110,.26), rgba(109,124,255,.16)); border-color: rgba(255,211,110,.52); }
+    .btn.danger{ background: rgba(255,91,122,.12); border-color: rgba(255,91,122,.45); }
+    .pill{
+      display:inline-flex;gap:8px;align-items:center;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 12px;
+      margin: 6px 6px 0 0;
+    }
+    .dot{width:9px;height:9px;border-radius:999px;background:var(--good)}
+    .dot.mid{background:var(--mid)}
+    .dot.gold{background:var(--gold)}
+    .canvasWrap{display:grid;gap:12px}
+    .stage{
+      position:relative;
+      border-radius: 18px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(4,6,16,.55);
+      overflow:hidden;
+      touch-action:none;
+    }
+    canvas{
+      width:100%;
+      height:auto;
+      display:block;
+      background: transparent;
+    }
+    .sliderUI{
+      position:absolute; inset:0;
+      pointer-events:none;
+    }
+    .divider{
+      position:absolute; top:0; bottom:0;
+      width:3px;
+      background: rgba(255,255,255,.85);
+      box-shadow: 0 0 0 1px rgba(0,0,0,.25);
+    }
+    .handle{
+      position:absolute; top:50%;
+      width:46px; height:46px;
+      border-radius: 999px;
+      transform: translate(-50%, -50%);
+      background: rgba(0,0,0,.45);
+      border:1px solid rgba(255,255,255,.18);
+      backdrop-filter: blur(10px);
+      box-shadow: var(--shadow);
+      display:flex;align-items:center;justify-content:center;
+      color: rgba(255,255,255,.9);
+      font-weight: 950;
+      font-size: 18px;
+    }
+    .tag{
+      position:absolute; top:12px;
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:950;
+      border:1px solid rgba(255,255,255,.16);
+      background: rgba(0,0,0,.35);
+      color: rgba(255,255,255,.9);
+      pointer-events:none;
+    }
+    .tag.left{left:12px}
+    .tag.right{right:12px}
+    .toggle{
+      display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;
+      padding:10px 12px;border-radius:18px;border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.05);
+    }
+    .tiny{font-size:12px;color:var(--sub);line-height:1.6}
+    .warn{
+      margin-top:10px;
+      padding:12px;
+      border-radius:18px;
+      border:1px solid rgba(255,211,110,.25);
+      background: rgba(255,211,110,.06);
+      color: var(--sub);
+      font-size:12px;
+      line-height:1.6;
+    }
+    .control{
+      padding:12px;
+      border-radius: 18px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.05);
+      margin-bottom:10px;
+    }
+    .control .top{display:flex;justify-content:space-between;gap:10px;align-items:center}
+    .control .name{font-weight:950;font-size:12px}
+    .control .val{font-size:12px;color:var(--sub);font-family:ui-monospace, Menlo, Monaco, Consolas, monospace}
+    input[type="range"]{width:100%}
+    select, input[type="color"]{
+      width:100%;
+      background: rgba(7,10,20,.62);
+      border:1px solid rgba(255,255,255,.14);
+      color: var(--text);
+      border-radius: 14px;
+      padding: 10px 12px;
+      outline:none;
+    }
+    .split{display:grid;gap:10px;grid-template-columns:1fr 1fr}
+    @media (max-width: 520px){ .split{grid-template-columns:1fr} }
+    .mono{font-family: ui-monospace, Menlo, Monaco, Consolas, monospace;}
+    .badge{
+      display:inline-flex;align-items:center;gap:8px;
+      font-size:12px;font-weight:950;
+      padding:6px 10px;border-radius:999px;
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.06);
+      white-space:nowrap;
+    }
+    .k{display:flex;gap:8px;flex-wrap:wrap}
+    .ck{display:flex;align-items:center;gap:8px}
+    .ck input{accent-color:#7aa7ff}
+    @media (max-width: 900px){
+      .wrap{padding:12px 10px 20px;}
+      .topbar{padding:12px; gap:10px;}
+      h1{font-size:15px;}
+      .row{width:100%;}
+      .row .btn{flex:1 1 calc(50% - 6px); min-height:44px; text-align:center; justify-content:center;}
+      .row label.btn{display:flex !important;}
+      .langWrap{width:100%; justify-content:space-between;}
+      .langSelect{flex:1;}
+      .hd{padding:12px 12px 9px;}
+      .bd{padding:12px;}
+      .pill{font-size:11px;}
+      .control{padding:10px;}
+    }
+    @media (max-width: 520px){
+      .row .btn{flex:1 1 100%;}
+      .handle{width:42px;height:42px;font-size:16px;}
+      .tag{font-size:11px;padding:5px 8px;}
+    }
+  </style>
 </head>
+
 <body>
-  <h1>Hello, world!</h1>
-  <button onclick="console.log('hello');">Press me</button>
-  <script defer type="text/javascript" src="/main.js"></script>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <h1><span id="appTitle">AI뷰티시뮬레이터</span> <span id="appSubtitle" style="color:var(--sub);font-weight:800;">— 더 티 나게 / Before-After 드래그</span></h1>
+          <div class="sub" id="topSub">
+            ✅ 브라우저에서만 처리(서버 업로드 없음) · ✅ 헤어스타일 오버레이 + 컨투어/하이라이트 강화 · ✅ 참고용 시뮬레이션
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="langWrap">
+          <label class="tiny" id="lblLang" for="langSelect">언어</label>
+          <select id="langSelect" class="langSelect" aria-label="Language">
+            <option value="ko">한국어</option>
+            <option value="en">English</option>
+            <option value="ja">日本語</option>
+            <option value="es">Español</option>
+            <option value="fr">Français</option>
+            <option value="de">Deutsch</option>
+          </select>
+        </div>
+        <button class="btn" id="btnUseCamera">카메라 사용</button>
+        <label class="btn" style="display:inline-flex;align-items:center;gap:10px;">
+          <span id="labelUpload">사진 업로드</span>
+          <input id="file" type="file" accept="image/*" style="display:none">
+        </label>
+        <button class="btn gold" id="btnSave" disabled>이미지 저장</button>
+        <button class="btn danger" id="btnReset">초기화</button>
+      </div>
+    </div>
+
+    <div class="grid">
+      <!-- LEFT: PREVIEW -->
+      <section class="card">
+        <div class="hd">
+          <div>
+            <div class="title" id="previewTitle">🪞 미리보기</div>
+            <div class="hint">
+              <span class="pill"><span class="dot"></span><span id="pillCompare">슬라이더 드래그로 Before/After 비교</span></span>
+              <span class="pill"><span class="dot mid"></span><span id="pillDepth">윤곽 핀치 + 광(하이라이트)로 “2.5D 착시”</span></span>
+              <span class="pill"><span class="dot gold"></span><span id="pillHair">헤어(앞머리/단발/장발) 오버레이</span></span>
+            </div>
+          </div>
+          <div class="row">
+            <button class="btn primary" id="btnPresetNatural" disabled>프리셋: 자연</button>
+            <button class="btn" id="btnPresetDramatic" disabled>프리셋: 드라마틱</button>
+            <button class="btn" id="btnPresetGlow" disabled>프리셋: 광택</button>
+          </div>
+        </div>
+        <div class="bd">
+          <div class="canvasWrap">
+            <div class="stage" id="stage">
+              <!-- result canvas -->
+              <canvas id="view" width="1280" height="960"></canvas>
+
+              <!-- UI overlay -->
+              <div class="sliderUI" id="sliderUI">
+                <div class="tag left" id="tagBefore">BEFORE</div>
+                <div class="tag right" id="tagAfter">AFTER</div>
+                <div class="divider" id="divider"></div>
+                <div class="handle" id="handle">↔</div>
+              </div>
+            </div>
+
+            <div class="toggle">
+              <div class="tiny">
+                <span class="badge" id="tipBadge">팁</span>
+                <span id="tipText">“강도”를 60~80으로 올리면 훨씬 <b>티</b>가 나고, “헤어 스타일”을 바꾸면 체감이 확 커져요.</span>
+              </div>
+              <div class="k">
+                <label class="ck tiny"><input type="checkbox" id="chkMirror" checked> <span id="lblMirror">거울</span></label>
+                <label class="ck tiny"><input type="checkbox" id="chkLandmarks"> <span id="lblLandmarks">랜드마크</span></label>
+                <label class="ck tiny"><input type="checkbox" id="chkHQ" checked> <span id="lblHQ">고화질</span></label>
+              </div>
+            </div>
+
+            <div class="warn" id="warnText">
+              <b id="warnTitle">면책</b> : <span id="warnBody">본 서비스는 오락 및 스타일 참고용 시뮬레이션입니다. 실제 시술/수술 결과를 예측하지 않습니다.</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT: CONTROLS -->
+      <aside class="card">
+        <div class="hd">
+          <div>
+            <div class="title" id="controlsTitle">🎛️ “더 티 나게” 컨트롤</div>
+            <div class="hint" id="controlsHint">이 버전은 일부러 체감이 크게 나도록(과감) 기본값/효과를 강화했습니다.</div>
+          </div>
+        </div>
+
+        <div class="bd">
+          <div class="control">
+            <div class="top"><div class="name">전체 강도</div><div class="val" id="vPower">65</div></div>
+            <input type="range" id="power" min="0" max="100" value="65">
+            <div class="desc">모든 변형/메이크업/윤곽 효과의 “마스터 게인”</div>
+          </div>
+
+          <div class="split">
+            <div class="control">
+              <div class="top"><div class="name">눈 크기</div><div class="val" id="vEye">20</div></div>
+              <input type="range" id="eye" min="-40" max="80" value="20">
+              <div class="desc">눈 확대/축소</div>
+            </div>
+            <div class="control">
+              <div class="top"><div class="name">눈 간격</div><div class="val" id="vEyeSpace">6</div></div>
+              <input type="range" id="eyeSpace" min="-40" max="40" value="6">
+              <div class="desc">눈을 안/밖으로 이동</div>
+            </div>
+          </div>
+
+          <div class="split">
+            <div class="control">
+              <div class="top"><div class="name">코 폭</div><div class="val" id="vNoseW">-10</div></div>
+              <input type="range" id="noseW" min="-55" max="55" value="-10">
+              <div class="desc">콧볼 느낌(가로 워프)</div>
+            </div>
+            <div class="control">
+              <div class="top"><div class="name">코 ‘높아보임’</div><div class="val" id="vNoseH">45</div></div>
+              <input type="range" id="noseH" min="0" max="100" value="45">
+              <div class="desc">콧대 하이라이트 + 양옆 쉐딩 강화</div>
+            </div>
+          </div>
+
+          <div class="split">
+            <div class="control">
+              <div class="top"><div class="name">입술 볼륨</div><div class="val" id="vLip">18</div></div>
+              <input type="range" id="lip" min="-40" max="65" value="18">
+              <div class="desc">입술 확대/축소</div>
+            </div>
+            <div class="control">
+              <div class="top"><div class="name">턱/윤곽</div><div class="val" id="vSlim">35</div></div>
+              <input type="range" id="slim" min="0" max="100" value="35">
+              <div class="desc">볼/턱 라인을 중앙으로 핀치(체감 큼)</div>
+            </div>
+          </div>
+
+          <div class="split">
+            <div class="control">
+              <div class="top"><div class="name">피부 보정</div><div class="val" id="vSkin">35</div></div>
+              <input type="range" id="skin" min="0" max="100" value="35">
+              <div class="desc">얼굴 영역 스무딩 + 톤</div>
+            </div>
+            <div class="control">
+              <div class="top"><div class="name">컨투어(쉐딩)</div><div class="val" id="vContour">35</div></div>
+              <input type="range" id="contour" min="0" max="100" value="35">
+              <div class="desc">광대/턱/코 옆 쉐딩</div>
+            </div>
+          </div>
+
+          <div class="split">
+            <div class="control">
+              <div class="top"><div class="name">블러셔</div><div class="val" id="vBlush">30</div></div>
+              <input type="range" id="blush" min="0" max="100" value="30">
+              <div class="desc">치크 컬러</div>
+            </div>
+            <div class="control">
+              <div class="top"><div class="name">아이라인</div><div class="val" id="vLiner">45</div></div>
+              <input type="range" id="liner" min="0" max="100" value="45">
+              <div class="desc">윗라인/눈꼬리 강조</div>
+            </div>
+          </div>
+
+          <div class="split">
+            <div class="control">
+              <div class="top"><div class="name">립 컬러</div><div class="val" id="vLipColor">#ff3e7a</div></div>
+              <input type="color" id="lipColor" value="#ff3e7a">
+              <div class="desc">입술 색상</div>
+            </div>
+            <div class="control">
+              <div class="top"><div class="name">립 글로스</div><div class="val" id="vGloss">35</div></div>
+              <input type="range" id="gloss" min="0" max="100" value="35">
+              <div class="desc">입술 광(2.5D 체감↑)</div>
+            </div>
+          </div>
+
+          <div class="control">
+            <div class="top"><div class="name">헤어 스타일</div><div class="val" id="vHairStyle">앞머리</div></div>
+            <select id="hairStyle">
+              <option value="none">없음</option>
+              <option value="bangs" selected>앞머리</option>
+              <option value="bob">단발(보브)</option>
+              <option value="long">장발</option>
+            </select>
+            <div class="desc">정밀 세그멘테이션 대신 “얼굴 외곽/이마 포인트” 기반으로 그럴듯한 오버레이를 만듭니다(티 많이 남).</div>
+          </div>
+
+          <div class="split">
+            <div class="control">
+              <div class="top"><div class="name">헤어 컬러</div><div class="val" id="vHairColor">#2b1a14</div></div>
+              <input type="color" id="hairColor" value="#2b1a14">
+              <div class="desc">헤어 오버레이 색</div>
+            </div>
+            <div class="control">
+              <div class="top"><div class="name">악세서리</div><div class="val" id="vAcc">ON</div></div>
+              <label class="ck tiny"><input type="checkbox" id="glasses" checked> <span id="lblGlasses">안경</span></label>
+              <label class="ck tiny"><input type="checkbox" id="earrings" checked> <span id="lblEarrings">귀걸이</span></label>
+              <div class="desc">눈/턱 위치 기반 오버레이</div>
+            </div>
+          </div>
+
+          <div class="tiny" style="margin-top:12px;" id="shootTipText">
+            <b id="shootTipTitle">촬영 팁</b><br/>
+            <span id="shootTipBody">정면 + 밝은 조명 + 얼굴이 크게 나오면(이마~턱) 훨씬 자연스럽고 티가 잘 납니다.</span>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <video id="video" playsinline style="display:none"></video>
+  <canvas id="src" width="1280" height="960" style="display:none"></canvas>
+
+  <!-- MediaPipe -->
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+
+  <script>
+    // =========================================================
+    // “더 티 나게” 포인트
+    // 1) Before/After 드래그 슬라이더(체감 폭발)
+    // 2) 윤곽 핀치(소프트 워프) + 컨투어/하이라이트 강화로 2.5D 착시
+    // 3) 헤어스타일(앞머리/단발/장발) 오버레이: 변화가 가장 눈에 띄는 요소
+    // =========================================================
+
+    const view = $('view');
+    const vctx = view.getContext('2d');
+
+    const src = $('src');
+    const sctx = src.getContext('2d');
+
+    const video = $('video');
+    const file = $('file');
+
+    // offscreen: before/after render
+    const beforeC = document.createElement('canvas');
+    beforeC.width = view.width; beforeC.height = view.height;
+    const bctx = beforeC.getContext('2d');
+
+    const afterC = document.createElement('canvas');
+    afterC.width = view.width; afterC.height = view.height;
+    const actx = afterC.getContext('2d');
+
+    const stage = $('stage');
+    const divider = $('divider');
+    const handle = $('handle');
+    const langSelect = $('langSelect');
+
+    let splitX = 0.55; // 0..1
+    let dragging = false;
+
+    // UI elements
+    const chkMirror = $('chkMirror');
+    const chkLandmarks = $('chkLandmarks');
+    const chkHQ = $('chkHQ');
+
+    const btnUseCamera = $('btnUseCamera');
+    const btnSave = $('btnSave');
+    const btnReset = $('btnReset');
+
+    const btnPresetNatural = $('btnPresetNatural');
+    const btnPresetDramatic = $('btnPresetDramatic');
+    const btnPresetGlow = $('btnPresetGlow');
+
+    // controls
+    const power = $('power');
+    const eye = $('eye'), eyeSpace = $('eyeSpace');
+    const noseW = $('noseW'), noseH = $('noseH');
+    const lip = $('lip'), slim = $('slim');
+    const skin = $('skin'), contour = $('contour'), blush = $('blush'), liner = $('liner'), gloss = $('gloss');
+    const lipColor = $('lipColor');
+    const hairStyle = $('hairStyle');
+    const hairColor = $('hairColor');
+    const glasses = $('glasses');
+    const earrings = $('earrings');
+
+    // value labels
+    const vPower = $('vPower');
+    const vEye = $('vEye'), vEyeSpace = $('vEyeSpace');
+    const vNoseW = $('vNoseW'), vNoseH = $('vNoseH');
+    const vLip = $('vLip'), vSlim = $('vSlim');
+    const vSkin = $('vSkin'), vContour = $('vContour'), vBlush = $('vBlush'), vLiner = $('vLiner'), vGloss = $('vGloss');
+    const vLipColor = $('vLipColor'), vHairStyle = $('vHairStyle'), vHairColor = $('vHairColor'), vAcc = $('vAcc');
+    const controlNameEls = Array.from(document.querySelectorAll('.control .name'));
+    const controlDescEls = Array.from(document.querySelectorAll('.control .desc'));
+
+    function $(id){ return document.getElementById(id); }
+
+    let usingCamera = false;
+    let camera = null;
+    let lastLandmarks = null;
+    let lastFrameCanvas = null;
+    let lastProcessAt = 0;
+    let currentLang = 'ko';
+
+    const I18N = {
+      ko: {
+        htmlLang: 'ko',
+        docTitle: 'AI뷰티시뮬레이터 — 더 티 나게 (Before/After 슬라이더)',
+        docDesc: '내 사진으로 눈/코/입/윤곽 워프 + 컨투어/하이라이트/아이라인/립/블러셔 + 헤어스타일 오버레이까지.',
+        appTitle: 'AI뷰티시뮬레이터',
+        appSubtitle: '— 더 티 나게 / Before-After 드래그',
+        topSub: '✅ 브라우저에서만 처리(서버 업로드 없음) · ✅ 헤어스타일 오버레이 + 컨투어/하이라이트 강화 · ✅ 참고용 시뮬레이션',
+        langLabel: '언어',
+        btnCamera: '카메라 사용',
+        btnUpload: '사진 업로드',
+        btnSave: '이미지 저장',
+        btnReset: '초기화',
+        previewTitle: '🪞 미리보기',
+        pillCompare: '슬라이더 드래그로 Before/After 비교',
+        pillDepth: '윤곽 핀치 + 광(하이라이트)로 “2.5D 착시”',
+        pillHair: '헤어(앞머리/단발/장발) 오버레이',
+        presetNatural: '프리셋: 자연',
+        presetDramatic: '프리셋: 드라마틱',
+        presetGlow: '프리셋: 광택',
+        tagBefore: 'BEFORE',
+        tagAfter: 'AFTER',
+        tipBadge: '팁',
+        tipText: '“강도”를 60~80으로 올리면 훨씬 <b>티</b>가 나고, “헤어 스타일”을 바꾸면 체감이 확 커져요.',
+        lblMirror: '거울',
+        lblLandmarks: '랜드마크',
+        lblHQ: '고화질',
+        warnTitle: '면책',
+        warnBody: '본 서비스는 오락 및 스타일 참고용 시뮬레이션입니다. 실제 시술/수술 결과를 예측하지 않습니다.',
+        controlsTitle: '🎛️ “더 티 나게” 컨트롤',
+        controlsHint: '이 버전은 일부러 체감이 크게 나도록(과감) 기본값/효과를 강화했습니다.',
+        controlNames: ['전체 강도', '눈 크기', '눈 간격', '코 폭', '코 ‘높아보임’', '입술 볼륨', '턱/윤곽', '피부 보정', '컨투어(쉐딩)', '블러셔', '아이라인', '립 컬러', '립 글로스', '헤어 스타일', '헤어 컬러', '악세서리'],
+        controlDescs: ['모든 변형/메이크업/윤곽 효과의 “마스터 게인”', '눈 확대/축소', '눈을 안/밖으로 이동', '콧볼 느낌(가로 워프)', '콧대 하이라이트 + 양옆 쉐딩 강화', '입술 확대/축소', '볼/턱 라인을 중앙으로 핀치(체감 큼)', '얼굴 영역 스무딩 + 톤', '광대/턱/코 옆 쉐딩', '치크 컬러', '윗라인/눈꼬리 강조', '입술 색상', '입술 광(2.5D 체감↑)', '정밀 세그멘테이션 대신 “얼굴 외곽/이마 포인트” 기반으로 그럴듯한 오버레이를 만듭니다(티 많이 남).', '헤어 오버레이 색', '눈/턱 위치 기반 오버레이'],
+        hairOptions: ['없음', '앞머리', '단발(보브)', '장발'],
+        lblGlasses: '안경',
+        lblEarrings: '귀걸이',
+        accOn: 'ON',
+        accOff: 'OFF',
+        shootTipTitle: '촬영 팁',
+        shootTipBody: '정면 + 밝은 조명 + 얼굴이 크게 나오면(이마~턱) 훨씬 자연스럽고 티가 잘 납니다.',
+        hintUpload: '사진을 업로드하거나 카메라를 켜주세요.',
+        cameraPermission: '카메라 권한을 허용해야 사용할 수 있어요.'
+      },
+      en: {
+        htmlLang: 'en',
+        docTitle: 'AI Beauty Simulator — Dramatic Before/After Slider',
+        docDesc: 'Eye/Nose/Lip/Contour warp with contour, highlight, eyeliner, lipstick, blush and hair overlays.',
+        appTitle: 'AI Beauty Simulator',
+        appSubtitle: '— More Dramatic / Before-After Drag',
+        topSub: '✅ In-browser only (no server upload) · ✅ Hair overlay + stronger contour/highlight · ✅ Simulation for reference',
+        langLabel: 'Language',
+        btnCamera: 'Use Camera',
+        btnUpload: 'Upload Photo',
+        btnSave: 'Save Image',
+        btnReset: 'Reset',
+        previewTitle: '🪞 Preview',
+        pillCompare: 'Drag slider to compare Before/After',
+        pillDepth: 'Contour pinch + highlight for a “2.5D” depth illusion',
+        pillHair: 'Hair overlay (bangs / bob / long)',
+        presetNatural: 'Preset: Natural',
+        presetDramatic: 'Preset: Dramatic',
+        presetGlow: 'Preset: Glow',
+        tagBefore: 'BEFORE',
+        tagAfter: 'AFTER',
+        tipBadge: 'Tip',
+        tipText: 'Set “Power” to 60~80 and switch “Hair Style” for a much stronger visible change.',
+        lblMirror: 'Mirror',
+        lblLandmarks: 'Landmarks',
+        lblHQ: 'High Quality',
+        warnTitle: 'Disclaimer',
+        warnBody: 'This simulator is for entertainment/reference only. Actual cosmetic or styling outcomes may differ.',
+        controlsTitle: '🎛️ Dramatic Controls',
+        controlsHint: 'This version intentionally boosts defaults for more visible changes.',
+        controlNames: ['Master Power', 'Eye Size', 'Eye Spacing', 'Nose Width', 'Nose Height Look', 'Lip Volume', 'Jaw/Contour', 'Skin Smoothing', 'Contour (Shading)', 'Blush', 'Eyeliner', 'Lip Color', 'Lip Gloss', 'Hair Style', 'Hair Color', 'Accessories'],
+        controlDescs: ['Master gain for all warps and makeup effects', 'Enlarge/reduce eyes', 'Move eyes inward/outward', 'Nostril width feel (horizontal warp)', 'Bridge highlight + side shading', 'Enlarge/reduce lips', 'Pinch cheek/jaw lines inward', 'Face region smoothing + tone', 'Cheek/jaw/nose-side shading', 'Cheek color', 'Upper line and tail emphasis', 'Lip color', 'Gloss highlight (2.5D boost)', 'Approximate overlay based on face outline/forehead points', 'Hair overlay color', 'Eye/jaw-based overlay accessories'],
+        hairOptions: ['None', 'Bangs', 'Bob', 'Long'],
+        lblGlasses: 'Glasses',
+        lblEarrings: 'Earrings',
+        accOn: 'ON',
+        accOff: 'OFF',
+        shootTipTitle: 'Capture Tip',
+        shootTipBody: 'Front-facing, bright lighting, and a larger face area in frame gives better results.',
+        hintUpload: 'Upload a photo or turn on the camera.',
+        cameraPermission: 'Camera permission is required to use this feature.'
+      },
+      ja: {
+        htmlLang: 'ja',
+        docTitle: 'AIビューティーシミュレーター — Before/After スライダー',
+        docDesc: '目・鼻・唇・輪郭ワープと、コントゥア/ハイライト/アイライン/リップ/チーク、ヘア重ね合わせ。',
+        appTitle: 'AIビューティーシミュレーター',
+        appSubtitle: '— 変化を強めに / Before-After ドラッグ',
+        topSub: '✅ ブラウザ内処理のみ（サーバー保存なし） · ✅ ヘア重ね合わせ + 強調メイク · ✅ 参考用シミュレーション',
+        langLabel: '言語',
+        btnCamera: 'カメラを使う',
+        btnUpload: '写真をアップロード',
+        btnSave: '画像を保存',
+        btnReset: 'リセット',
+        previewTitle: '🪞 プレビュー',
+        pillCompare: 'スライダーで Before/After 比較',
+        pillDepth: '輪郭ピンチ + ハイライトで 2.5D 立体感',
+        pillHair: 'ヘア重ね合わせ（前髪 / ボブ / ロング）',
+        presetNatural: 'プリセット: ナチュラル',
+        presetDramatic: 'プリセット: ドラマチック',
+        presetGlow: 'プリセット: ツヤ',
+        tagBefore: 'BEFORE',
+        tagAfter: 'AFTER',
+        tipBadge: 'ヒント',
+        tipText: '「強度」を60〜80に上げて「ヘアスタイル」を変えると、違いがよりはっきり出ます。',
+        lblMirror: 'ミラー',
+        lblLandmarks: 'ランドマーク',
+        lblHQ: '高画質',
+        warnTitle: '免責',
+        warnBody: '本シミュレーターは娯楽・参考用です。実際の施術/スタイリング結果とは異なる場合があります。',
+        controlsTitle: '🎛️ 強調コントロール',
+        controlsHint: '体感差が出るよう、効果を強めに設定しています。',
+        controlNames: ['全体強度', '目の大きさ', '目の間隔', '鼻幅', '鼻を高く見せる', '唇ボリューム', '顎/輪郭', '肌補正', 'コントゥア', 'チーク', 'アイライン', 'リップカラー', 'リップグロス', 'ヘアスタイル', 'ヘアカラー', 'アクセサリー'],
+        controlDescs: ['全体効果のマスターゲイン', '目を拡大/縮小', '目を内側/外側に移動', '小鼻の横方向ワープ', '鼻筋ハイライト + サイドシェード', '唇を拡大/縮小', '頬/顎ラインを内側にピンチ', '顔領域のスムージング + トーン', '頬骨/顎/鼻横の陰影', 'チークカラー', '上まぶたライン強調', '唇の色', '唇のツヤ', '顔輪郭/額ポイントに基づく重ね合わせ', 'ヘア重ね合わせの色', '目/顎位置ベースのアクセサリー'],
+        hairOptions: ['なし', '前髪', 'ボブ', 'ロング'],
+        lblGlasses: 'メガネ',
+        lblEarrings: 'イヤリング',
+        accOn: 'ON',
+        accOff: 'OFF',
+        shootTipTitle: '撮影のコツ',
+        shootTipBody: '正面 + 明るい照明 + 顔が大きく写る構図で自然に見えます。',
+        hintUpload: '写真をアップロードするか、カメラをオンにしてください。',
+        cameraPermission: 'カメラ権限を許可すると利用できます。'
+      },
+      es: {
+        htmlLang: 'es',
+        docTitle: 'Simulador de Belleza AI — Deslizador Before/After',
+        docDesc: 'Warp de ojos/nariz/labios/contorno con contour, highlight, delineado, labial, rubor y peinados.',
+        appTitle: 'Simulador de Belleza AI',
+        appSubtitle: '— Más Notorio / Arrastrar Before-After',
+        topSub: '✅ Solo en navegador (sin subir al servidor) · ✅ Superposición de peinado + contour/highlight reforzado · ✅ Simulación de referencia',
+        langLabel: 'Idioma',
+        btnCamera: 'Usar Cámara',
+        btnUpload: 'Subir Foto',
+        btnSave: 'Guardar Imagen',
+        btnReset: 'Reiniciar',
+        previewTitle: '🪞 Vista previa',
+        pillCompare: 'Arrastra para comparar Before/After',
+        pillDepth: 'Pinch de contorno + highlight para efecto 2.5D',
+        pillHair: 'Superposición de cabello (flequillo / bob / largo)',
+        presetNatural: 'Preset: Natural',
+        presetDramatic: 'Preset: Dramático',
+        presetGlow: 'Preset: Glow',
+        tagBefore: 'ANTES',
+        tagAfter: 'DESPUÉS',
+        tipBadge: 'Tip',
+        tipText: 'Sube “Potencia” a 60~80 y cambia “Peinado” para notar más diferencia.',
+        lblMirror: 'Espejo',
+        lblLandmarks: 'Puntos',
+        lblHQ: 'Alta Calidad',
+        warnTitle: 'Aviso',
+        warnBody: 'Este simulador es solo para entretenimiento/referencia. El resultado real puede variar.',
+        controlsTitle: '🎛️ Controles Intensos',
+        controlsHint: 'Esta versión eleva los valores por defecto para un cambio más visible.',
+        controlNames: ['Potencia Global', 'Tamaño de Ojos', 'Separación de Ojos', 'Ancho de Nariz', 'Nariz Más Alta', 'Volumen de Labios', 'Mandíbula/Contorno', 'Suavizado de Piel', 'Contour (Sombra)', 'Rubor', 'Delineado', 'Color de Labios', 'Brillo de Labios', 'Peinado', 'Color de Cabello', 'Accesorios'],
+        controlDescs: ['Ganancia maestra de todos los efectos', 'Aumentar/reducir ojos', 'Mover ojos hacia dentro/fuera', 'Warp horizontal de nariz', 'Highlight de puente + sombra lateral', 'Aumentar/reducir labios', 'Pinzar mejilla/mandíbula al centro', 'Suavizado y tono en rostro', 'Sombra en pómulo/mandíbula/nariz', 'Color de mejilla', 'Énfasis en línea superior y cola', 'Color de labios', 'Brillo para efecto 2.5D', 'Superposición aproximada por contorno facial', 'Color de superposición de cabello', 'Accesorios según ojos/mandíbula'],
+        hairOptions: ['Ninguno', 'Flequillo', 'Bob', 'Largo'],
+        lblGlasses: 'Gafas',
+        lblEarrings: 'Aretes',
+        accOn: 'ON',
+        accOff: 'OFF',
+        shootTipTitle: 'Tip de Captura',
+        shootTipBody: 'Frontal + buena iluminación + rostro grande en cuadro mejora el resultado.',
+        hintUpload: 'Sube una foto o activa la cámara.',
+        cameraPermission: 'Debes permitir la cámara para usar esta función.'
+      },
+      fr: {
+        htmlLang: 'fr',
+        docTitle: 'Simulateur Beauté IA — Curseur Before/After',
+        docDesc: 'Warp yeux/nez/lèvres/contour avec contouring, highlight, eyeliner, lèvres, blush et coiffures.',
+        appTitle: 'Simulateur Beauté IA',
+        appSubtitle: '— Plus marqué / Glisser Before-After',
+        topSub: '✅ Traitement local navigateur (sans upload serveur) · ✅ Overlay cheveux + contour/highlight renforcés · ✅ Simulation de référence',
+        langLabel: 'Langue',
+        btnCamera: 'Utiliser la Caméra',
+        btnUpload: 'Importer une Photo',
+        btnSave: 'Enregistrer l’image',
+        btnReset: 'Réinitialiser',
+        previewTitle: '🪞 Aperçu',
+        pillCompare: 'Glissez pour comparer Before/After',
+        pillDepth: 'Pincement du contour + highlight pour effet 2.5D',
+        pillHair: 'Overlay cheveux (frange / carré / long)',
+        presetNatural: 'Préréglage : Naturel',
+        presetDramatic: 'Préréglage : Dramatique',
+        presetGlow: 'Préréglage : Glow',
+        tagBefore: 'AVANT',
+        tagAfter: 'APRÈS',
+        tipBadge: 'Astuce',
+        tipText: 'Montez “Puissance” à 60~80 et changez “Style de cheveux” pour un effet net.',
+        lblMirror: 'Miroir',
+        lblLandmarks: 'Repères',
+        lblHQ: 'Haute Qualité',
+        warnTitle: 'Avertissement',
+        warnBody: 'Simulateur à but ludique/référence. Le résultat réel peut différer.',
+        controlsTitle: '🎛️ Contrôles Renforcés',
+        controlsHint: 'Cette version accentue les réglages pour des changements plus visibles.',
+        controlNames: ['Puissance Globale', 'Taille des Yeux', 'Écart des Yeux', 'Largeur du Nez', 'Nez Plus Haut', 'Volume des Lèvres', 'Mâchoire/Contour', 'Lissage de la Peau', 'Contour (Ombres)', 'Blush', 'Eyeliner', 'Couleur des Lèvres', 'Gloss Lèvres', 'Style de Cheveux', 'Couleur des Cheveux', 'Accessoires'],
+        controlDescs: ['Gain maître de tous les effets', 'Agrandir/réduire les yeux', 'Déplacer les yeux dedans/dehors', 'Warp horizontal du nez', 'Highlight de l’arête + ombre latérale', 'Agrandir/réduire les lèvres', 'Pincer joues/mâchoire vers le centre', 'Lissage + tonalité du visage', 'Ombres pommettes/mâchoire/nez', 'Couleur des joues', 'Accent du trait supérieur', 'Couleur des lèvres', 'Brillance 2.5D', 'Overlay basé sur contour visage/front', 'Couleur de l’overlay cheveux', 'Accessoires basés yeux/mâchoire'],
+        hairOptions: ['Aucun', 'Frange', 'Carré', 'Long'],
+        lblGlasses: 'Lunettes',
+        lblEarrings: 'Boucles',
+        accOn: 'ON',
+        accOff: 'OFF',
+        shootTipTitle: 'Conseil de Prise',
+        shootTipBody: 'Face caméra + lumière vive + visage bien cadré donne un rendu plus naturel.',
+        hintUpload: 'Importez une photo ou activez la caméra.',
+        cameraPermission: 'L’autorisation caméra est nécessaire.'
+      },
+      de: {
+        htmlLang: 'de',
+        docTitle: 'AI Beauty Simulator — Before/After Slider',
+        docDesc: 'Augen/Nase/Lippen/Kontur-Warp mit Contour, Highlight, Eyeliner, Lipcolor, Blush und Haar-Overlay.',
+        appTitle: 'AI Beauty Simulator',
+        appSubtitle: '— Deutlicher / Before-After Ziehen',
+        topSub: '✅ Nur im Browser (kein Server-Upload) · ✅ Haar-Overlay + stärkere Kontur/Highlights · ✅ Referenz-Simulation',
+        langLabel: 'Sprache',
+        btnCamera: 'Kamera nutzen',
+        btnUpload: 'Foto hochladen',
+        btnSave: 'Bild speichern',
+        btnReset: 'Zurücksetzen',
+        previewTitle: '🪞 Vorschau',
+        pillCompare: 'Slider ziehen für Before/After',
+        pillDepth: 'Kontur-Pinch + Highlight für 2.5D-Effekt',
+        pillHair: 'Haar-Overlay (Pony / Bob / Lang)',
+        presetNatural: 'Preset: Natürlich',
+        presetDramatic: 'Preset: Dramatisch',
+        presetGlow: 'Preset: Glow',
+        tagBefore: 'VORHER',
+        tagAfter: 'NACHHER',
+        tipBadge: 'Tipp',
+        tipText: '„Stärke“ auf 60~80 erhöhen und „Frisur“ wechseln für klarere Veränderung.',
+        lblMirror: 'Spiegeln',
+        lblLandmarks: 'Landmarks',
+        lblHQ: 'Hohe Qualität',
+        warnTitle: 'Hinweis',
+        warnBody: 'Dieser Simulator dient nur zur Unterhaltung/Referenz. Reale Ergebnisse können abweichen.',
+        controlsTitle: '🎛️ Deutliche Steuerung',
+        controlsHint: 'Diese Version verstärkt Standardwerte für sichtbare Effekte.',
+        controlNames: ['Gesamtstärke', 'Augengröße', 'Augenabstand', 'Nasenbreite', 'Nase höher wirken', 'Lippenvolumen', 'Kiefer/Kontur', 'Hautkorrektur', 'Kontur (Schatten)', 'Rouge', 'Eyeliner', 'Lippenfarbe', 'Lip Gloss', 'Frisur', 'Haarfarbe', 'Accessoires'],
+        controlDescs: ['Master-Gain aller Effekte', 'Augen vergrößern/verkleinern', 'Augen nach innen/außen verschieben', 'Horizontaler Nasen-Warp', 'Nasenrücken-Highlight + Seitenschatten', 'Lippen vergrößern/verkleinern', 'Wangen/Kiefer zur Mitte pinchen', 'Glättung + Hautton', 'Schatten an Wange/Kiefer/Nase', 'Wangenfarbe', 'Oberes Lid stärker betonen', 'Farbe der Lippen', 'Lippenglanz für 2.5D', 'Overlay anhand Gesichtsform/Stirn', 'Farbe des Haar-Overlays', 'Overlay-Accessoires nach Augen/Kiefer'],
+        hairOptions: ['Keins', 'Pony', 'Bob', 'Lang'],
+        lblGlasses: 'Brille',
+        lblEarrings: 'Ohrringe',
+        accOn: 'ON',
+        accOff: 'OFF',
+        shootTipTitle: 'Aufnahme-Tipp',
+        shootTipBody: 'Frontal + helles Licht + großes Gesicht im Bild verbessert das Ergebnis.',
+        hintUpload: 'Foto hochladen oder Kamera einschalten.',
+        cameraPermission: 'Kameraberechtigung ist erforderlich.'
+      }
+    };
+
+    function tr(){
+      return I18N[currentLang] || I18N.ko;
+    }
+
+    // FaceMesh init
+    const faceMesh = new FaceMesh({
+      locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`
+    });
+    faceMesh.setOptions({
+      maxNumFaces: 1,
+      refineLandmarks: true,
+      minDetectionConfidence: 0.6,
+      minTrackingConfidence: 0.6
+    });
+    faceMesh.onResults(onResults);
+
+    // ----- Slider UI (Before/After split) -----
+    function updateSplitUI(){
+      const rect = stage.getBoundingClientRect();
+      const x = rect.width * splitX;
+      divider.style.left = `${x - 1.5}px`;
+      handle.style.left = `${x}px`;
+    }
+    updateSplitUI();
+    window.addEventListener('resize', ()=>{
+      updateSplitUI();
+      if(!usingCamera && lastFrameCanvas) renderAll();
+    });
+
+    function isMobileViewport(){
+      return window.matchMedia('(max-width: 900px)').matches;
+    }
+
+    function frameIntervalMs(){
+      if(!usingCamera) return 0;
+      if(isMobileViewport()) return chkHQ.checked ? 95 : 150;
+      return chkHQ.checked ? 36 : 68;
+    }
+
+    function applyLanguage(lang){
+      if(!I18N[lang]) lang = 'ko';
+      currentLang = lang;
+      const text = tr();
+      document.documentElement.lang = text.htmlLang;
+      document.title = text.docTitle;
+      const metaDesc = document.querySelector('meta[name="description"]');
+      if(metaDesc) metaDesc.setAttribute('content', text.docDesc);
+
+      $('appTitle').textContent = text.appTitle;
+      $('appSubtitle').textContent = text.appSubtitle;
+      $('topSub').textContent = text.topSub;
+      $('lblLang').textContent = text.langLabel;
+      btnUseCamera.textContent = text.btnCamera;
+      $('labelUpload').textContent = text.btnUpload;
+      btnSave.textContent = text.btnSave;
+      btnReset.textContent = text.btnReset;
+      $('previewTitle').textContent = text.previewTitle;
+      $('pillCompare').textContent = text.pillCompare;
+      $('pillDepth').textContent = text.pillDepth;
+      $('pillHair').textContent = text.pillHair;
+      btnPresetNatural.textContent = text.presetNatural;
+      btnPresetDramatic.textContent = text.presetDramatic;
+      btnPresetGlow.textContent = text.presetGlow;
+      $('tagBefore').textContent = text.tagBefore;
+      $('tagAfter').textContent = text.tagAfter;
+      $('tipBadge').textContent = text.tipBadge;
+      $('tipText').innerHTML = text.tipText;
+      $('lblMirror').textContent = text.lblMirror;
+      $('lblLandmarks').textContent = text.lblLandmarks;
+      $('lblHQ').textContent = text.lblHQ;
+      $('warnTitle').textContent = text.warnTitle;
+      $('warnBody').textContent = text.warnBody;
+      $('controlsTitle').textContent = text.controlsTitle;
+      $('controlsHint').textContent = text.controlsHint;
+      $('lblGlasses').textContent = text.lblGlasses;
+      $('lblEarrings').textContent = text.lblEarrings;
+      $('shootTipTitle').textContent = text.shootTipTitle;
+      $('shootTipBody').textContent = text.shootTipBody;
+
+      for(let i=0;i<controlNameEls.length;i++){
+        if(text.controlNames[i]) controlNameEls[i].textContent = text.controlNames[i];
+      }
+      for(let i=0;i<controlDescEls.length;i++){
+        if(text.controlDescs[i]) controlDescEls[i].textContent = text.controlDescs[i];
+      }
+
+      const hairOptions = hairStyle.querySelectorAll('option');
+      text.hairOptions.forEach((name, idx)=>{
+        if(hairOptions[idx]) hairOptions[idx].textContent = name;
+      });
+
+      setValLabels();
+      if(!lastFrameCanvas){
+        vctx.fillStyle = "rgb(9,12,26)";
+        vctx.fillRect(0,0,view.width,view.height);
+        drawHint(vctx, text.hintUpload);
+      }
+    }
+
+    function detectLanguage(){
+      const nav = (navigator.language || 'ko').toLowerCase();
+      if(nav.startsWith('ko')) return 'ko';
+      if(nav.startsWith('ja')) return 'ja';
+      if(nav.startsWith('es')) return 'es';
+      if(nav.startsWith('fr')) return 'fr';
+      if(nav.startsWith('de')) return 'de';
+      if(nav.startsWith('en')) return 'en';
+      return 'en';
+    }
+
+    function pointerToSplit(e){
+      const rect = stage.getBoundingClientRect();
+      const clientX = (e.touches && e.touches[0]) ? e.touches[0].clientX : e.clientX;
+      let x = (clientX - rect.left) / rect.width;
+      x = Math.max(0.02, Math.min(0.98, x));
+      splitX = x;
+      updateSplitUI();
+      composite();
+    }
+
+    stage.addEventListener('pointerdown', (e)=>{ dragging = true; stage.setPointerCapture(e.pointerId); pointerToSplit(e); });
+    stage.addEventListener('pointermove', (e)=>{ if(dragging) pointerToSplit(e); });
+    stage.addEventListener('pointerup', ()=> dragging = false);
+    stage.addEventListener('pointercancel', ()=> dragging = false);
+
+    stage.addEventListener('touchstart', (e)=>{ dragging = true; pointerToSplit(e); }, {passive:true});
+    stage.addEventListener('touchmove', (e)=>{ if(dragging) pointerToSplit(e); }, {passive:true});
+    stage.addEventListener('touchend', ()=> dragging = false);
+    langSelect.addEventListener('change', ()=> applyLanguage(langSelect.value));
+
+    // ----- UI bindings -----
+    const inputs = [
+      chkMirror, chkLandmarks, chkHQ,
+      power, eye, eyeSpace, noseW, noseH, lip, slim,
+      skin, contour, blush, liner, gloss,
+      lipColor, hairStyle, hairColor,
+      glasses, earrings
+    ];
+    inputs.forEach(el=>{
+      el.addEventListener('input', ()=>{ setValLabels(); renderAll(); });
+      el.addEventListener('change', ()=>{ setValLabels(); renderAll(); });
+    });
+
+    btnPresetNatural.addEventListener('click', ()=>{
+      applyPreset('natural');
+      renderAll();
+    });
+    btnPresetDramatic.addEventListener('click', ()=>{
+      applyPreset('dramatic');
+      renderAll();
+    });
+    btnPresetGlow.addEventListener('click', ()=>{
+      applyPreset('glow');
+      renderAll();
+    });
+
+    btnUseCamera.addEventListener('click', async ()=>{
+      if(usingCamera) return;
+      usingCamera = true;
+      await startCamera();
+    });
+
+    file.addEventListener('change', async (e)=>{
+      const f = e.target.files?.[0];
+      if(!f) return;
+
+      await stopCamera();
+      usingCamera = false;
+
+      const url = URL.createObjectURL(f);
+      const img = new Image();
+      img.onload = async ()=>{
+        drawContainToCanvas(img, sctx, src);
+        await faceMesh.send({image: src});
+        URL.revokeObjectURL(url);
+      };
+      img.src = url;
+    });
+
+    btnSave.addEventListener('click', ()=>{
+      // save the composite view canvas
+      const a = document.createElement('a');
+      a.href = view.toDataURL('image/png');
+      a.download = 'beauty-before-after.png';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    });
+
+    btnReset.addEventListener('click', async ()=>{
+      applyPreset('dramatic'); // keep fun default
+      lastLandmarks = null;
+      lastFrameCanvas = null;
+
+      if(usingCamera) await stopCamera();
+      usingCamera = false;
+
+      // placeholder
+      vctx.setTransform(1,0,0,1,0,0);
+      vctx.fillStyle = "rgb(9,12,26)";
+      vctx.fillRect(0,0,view.width,view.height);
+      drawHint(vctx, tr().hintUpload);
+      setActions(false);
+    });
+
+    function setActions(on){
+      btnSave.disabled = !on;
+      btnPresetNatural.disabled = !on;
+      btnPresetDramatic.disabled = !on;
+      btnPresetGlow.disabled = !on;
+    }
+
+    function setValLabels(){
+      const text = tr();
+      vPower.textContent = power.value;
+      vEye.textContent = eye.value;
+      vEyeSpace.textContent = eyeSpace.value;
+      vNoseW.textContent = noseW.value;
+      vNoseH.textContent = noseH.value;
+      vLip.textContent = lip.value;
+      vSlim.textContent = slim.value;
+      vSkin.textContent = skin.value;
+      vContour.textContent = contour.value;
+      vBlush.textContent = blush.value;
+      vLiner.textContent = liner.value;
+      vGloss.textContent = gloss.value;
+      vLipColor.textContent = lipColor.value;
+      vHairStyle.textContent = hairStyle.options[hairStyle.selectedIndex].textContent;
+      vHairColor.textContent = hairColor.value;
+      vAcc.textContent = (glasses.checked || earrings.checked) ? text.accOn : text.accOff;
+    }
+
+    function applyPreset(name){
+      // you asked “더 티 나게”, so defaults are already strong.
+      if(name === 'natural'){
+        power.value = 45;
+        eye.value = 12; eyeSpace.value = 4;
+        noseW.value = -8; noseH.value = 28;
+        lip.value = 10; slim.value = 22;
+        skin.value = 28; contour.value = 22; blush.value = 18; liner.value = 28; gloss.value = 22;
+        hairStyle.value = "bangs";
+        glasses.checked = false; earrings.checked = true;
+      }
+      if(name === 'dramatic'){
+        power.value = 75;
+        eye.value = 30; eyeSpace.value = 8;
+        noseW.value = -14; noseH.value = 55;
+        lip.value = 22; slim.value = 45;
+        skin.value = 38; contour.value = 40; blush.value = 32; liner.value = 55; gloss.value = 40;
+        hairStyle.value = "bob";
+        glasses.checked = true; earrings.checked = true;
+      }
+      if(name === 'glow'){
+        power.value = 70;
+        eye.value = 22; eyeSpace.value = 6;
+        noseW.value = -12; noseH.value = 65;
+        lip.value = 18; slim.value = 35;
+        skin.value = 50; contour.value = 28; blush.value = 26; liner.value = 38; gloss.value = 70;
+        hairStyle.value = "long";
+        glasses.checked = false; earrings.checked = true;
+      }
+      setValLabels();
+    }
+
+    if(isMobileViewport()) chkHQ.checked = false;
+    const initialLang = detectLanguage();
+    langSelect.value = initialLang;
+    applyLanguage(initialLang);
+
+    // initial preset
+    applyPreset('dramatic');
+    setActions(false);
+
+    // placeholder
+    vctx.fillStyle = "rgb(9,12,26)";
+    vctx.fillRect(0,0,view.width,view.height);
+    drawHint(vctx, tr().hintUpload);
+
+    // ----- Camera -----
+    async function startCamera(){
+      try{
+        const stream = await navigator.mediaDevices.getUserMedia({ video:{ facingMode:"user" }, audio:false });
+        video.srcObject = stream;
+        await video.play();
+
+        camera = new Camera(video, {
+          onFrame: async ()=>{
+            const now = performance.now();
+            if(now - lastProcessAt < frameIntervalMs()) return;
+            lastProcessAt = now;
+            drawContainToCanvas(video, sctx, src);
+            await faceMesh.send({image: src});
+          },
+          width: 1280,
+          height: 960
+        });
+        camera.start();
+      }catch(err){
+        console.error(err);
+        alert(tr().cameraPermission);
+        usingCamera = false;
+      }
+    }
+
+    async function stopCamera(){
+      if(camera){
+        try{ camera.stop(); }catch{}
+        camera = null;
+      }
+      const stream = video.srcObject;
+      if(stream && stream.getTracks) stream.getTracks().forEach(t=>t.stop());
+      video.srcObject = null;
+    }
+
+    // ----- FaceMesh results -----
+    function onResults(results){
+      lastLandmarks = results.multiFaceLandmarks?.[0] || null;
+      lastFrameCanvas = src;
+      setActions(true);
+      renderAll();
+    }
+
+    // ----- Render pipeline -----
+    function renderAll(){
+      if(!lastFrameCanvas){
+        vctx.setTransform(1,0,0,1,0,0);
+        vctx.fillStyle = "rgb(9,12,26)";
+        vctx.fillRect(0,0,view.width,view.height);
+        drawHint(vctx, tr().hintUpload);
+        return;
+      }
+      renderBefore();
+      renderAfter();
+      composite();
+    }
+
+    function renderBefore(){
+      bctx.setTransform(1,0,0,1,0,0);
+      bctx.clearRect(0,0,beforeC.width,beforeC.height);
+
+      if(chkMirror.checked){
+        bctx.translate(beforeC.width, 0);
+        bctx.scale(-1, 1);
+      }
+      bctx.drawImage(lastFrameCanvas, 0, 0, beforeC.width, beforeC.height);
+
+      if(chkLandmarks.checked && lastLandmarks){
+        drawLandmarks(lastLandmarks, bctx);
+      }
+    }
+
+    function renderAfter(){
+      actx.setTransform(1,0,0,1,0,0);
+      actx.clearRect(0,0,afterC.width,afterC.height);
+
+      if(chkMirror.checked){
+        actx.translate(afterC.width, 0);
+        actx.scale(-1, 1);
+      }
+      actx.drawImage(lastFrameCanvas, 0, 0, afterC.width, afterC.height);
+
+      if(!lastLandmarks){
+        return;
+      }
+
+      // master power
+      const PWR = Number(power.value) / 100; // 0..1
+      const HQ = chkHQ.checked;
+
+      const lm = lastLandmarks;
+      const W = afterC.width, H = afterC.height;
+      const Pt = (i)=>({x: lm[i].x * W, y: lm[i].y * H});
+
+      // anchors
+      const leftEyeC  = avg([Pt(33), Pt(133), Pt(159), Pt(145)]);
+      const rightEyeC = avg([Pt(362), Pt(263), Pt(386), Pt(374)]);
+      const mouthC    = avg([Pt(13), Pt(14), Pt(78), Pt(308)]);
+      const noseTip   = Pt(1);
+      const noseBridge= avg([Pt(6), Pt(168), Pt(197)]);
+      const chinTip   = Pt(152);
+
+      const leftCheek  = avg([Pt(234), Pt(93), Pt(132)]);
+      const rightCheek = avg([Pt(454), Pt(323), Pt(361)]);
+      const leftJawMid  = Pt(172);
+      const rightJawMid = Pt(397);
+
+      // face oval mask
+      const faceOvalIdx = [10,338,297,332,284,251,389,356,454,323,361,288,397,365,379,378,400,377,152,148,176,149,150,136,172,58,132,93,234,127,162,21,54,103,67,109];
+      const faceOval = faceOvalIdx.map(Pt);
+
+      // parameters (scaled by power)
+      const eyeScale = (Number(eye.value)/100) * (0.55 + 0.75*PWR);
+      const eyeSpaceV= (Number(eyeSpace.value)/100) * (0.55 + 0.75*PWR);
+
+      const noseWV = (Number(noseW.value)/100) * (0.55 + 0.85*PWR);
+      const noseHV = (Number(noseH.value)/100) * (0.45 + 0.85*PWR);
+
+      const lipScale = (Number(lip.value)/100) * (0.55 + 0.80*PWR);
+      const slimV = (Number(slim.value)/100) * (0.55 + 0.85*PWR);
+
+      const skinV = (Number(skin.value)/100) * (0.55 + 0.85*PWR);
+      const contourV = (Number(contour.value)/100) * (0.55 + 0.85*PWR);
+      const blushV = (Number(blush.value)/100) * (0.55 + 0.85*PWR);
+      const linerV = (Number(liner.value)/100) * (0.55 + 0.85*PWR);
+      const glossV = (Number(gloss.value)/100) * (0.55 + 0.85*PWR);
+
+      // 1) skin (stronger)
+      if(skinV > 0.001){
+        applySkin(actx, faceOval, skinV, HQ);
+      }
+
+      // 2) Slim pinch (the most “티 남”)
+      if(slimV > 0.001){
+        softPinch(actx, leftCheek,   360, 520, slimV*0.55, +1, HQ);
+        softPinch(actx, rightCheek,  360, 520, slimV*0.55, -1, HQ);
+        softPinch(actx, leftJawMid,  330, 480, slimV*0.65, +1, HQ);
+        softPinch(actx, rightJawMid, 330, 480, slimV*0.65, -1, HQ);
+        // extra “V-line” feel near chin
+        softPinch(actx, chinTip, 420, 440, slimV*0.30, 0, HQ); // 0 => symmetrical inward
+      }
+
+      // 3) eyes (spacing + scaling)
+      if(Math.abs(eyeSpaceV) > 0.001){
+        shiftRegion(actx, leftEyeC,  280, 200, -eyeSpaceV*100);
+        shiftRegion(actx, rightEyeC, 280, 200, +eyeSpaceV*100);
+      }
+      if(Math.abs(eyeScale) > 0.001){
+        regionScale(actx, leftEyeC,  280, 200, 1 + eyeScale, 1 + eyeScale*0.85);
+        regionScale(actx, rightEyeC, 280, 200, 1 + eyeScale, 1 + eyeScale*0.85);
+      }
+
+      // 4) nose width (narrow/widen)
+      if(Math.abs(noseWV) > 0.001){
+        regionScale(actx, noseTip,  360, 520, 1 + noseWV, 1);
+      }
+
+      // 5) lips
+      if(Math.abs(lipScale) > 0.001){
+        regionScale(actx, mouthC, 560, 360, 1 + lipScale, 1 + lipScale*0.70);
+      }
+
+      // 6) Contour + highlight (make it “3D-ish”)
+      if(contourV > 0.001 || noseHV > 0.001){
+        applyContourHighlight(actx, {
+          faceOval, noseBridge, noseTip,
+          leftCheek, rightCheek, chinTip,
+          contourV, noseHV, HQ
+        });
+      }
+
+      // 7) blush
+      if(blushV > 0.001){
+        applyBlush(actx, leftCheek, rightCheek, blushV, HQ);
+      }
+
+      // 8) eyeliner
+      if(linerV > 0.001){
+        applyEyeliner(actx, lm, linerV);
+      }
+
+      // 9) lips color + gloss
+      applyLips(actx, lm, lipColor.value, 0.18 + 0.62*Math.max(0, lipScale+0.15), glossV, HQ);
+
+      // 10) hair overlay (THIS makes it super obvious)
+      if(hairStyle.value !== 'none'){
+        drawHairOverlay(actx, lm, hairStyle.value, hairColor.value, HQ);
+      }
+
+      // 11) accessories
+      if(glasses.checked) drawGlasses(actx, leftEyeC, rightEyeC);
+      if(earrings.checked){
+        const leftJaw = Pt(234);
+        const rightJaw = Pt(454);
+        drawEarrings(actx, leftJaw, rightJaw, HQ);
+      }
+
+      if(chkLandmarks.checked) drawLandmarks(lm, actx);
+    }
+
+    // composite split view onto main canvas
+    function composite(){
+      const W = view.width, H = view.height;
+      vctx.setTransform(1,0,0,1,0,0);
+      vctx.clearRect(0,0,W,H);
+
+      // Draw AFTER full, then clip BEFORE on left side (so handle shows transition)
+      vctx.drawImage(afterC, 0, 0);
+
+      const cut = Math.floor(W * splitX);
+      vctx.save();
+      vctx.beginPath();
+      vctx.rect(0,0,cut,H);
+      vctx.clip();
+      vctx.drawImage(beforeC, 0, 0);
+      vctx.restore();
+    }
+
+    // ----- Helpers / Effects -----
+    function drawHint(ctx, text){
+      const line2 = tr().shootTipBody;
+      ctx.save();
+      ctx.fillStyle = "rgb(9,12,26)";
+      ctx.fillRect(0,0,view.width,view.height);
+      ctx.fillStyle = "rgba(255,255,255,.90)";
+      ctx.font = "900 28px ui-sans-serif";
+      ctx.fillText(text, 48, 120);
+      ctx.fillStyle = "rgba(255,255,255,.55)";
+      ctx.font = "700 16px ui-sans-serif";
+      ctx.fillText(line2, 48, 150);
+      ctx.restore();
+    }
+
+    function drawContainToCanvas(media, ctx, canvas){
+      const cw = canvas.width, ch = canvas.height;
+      const mw = media.videoWidth || media.naturalWidth || media.width;
+      const mh = media.videoHeight || media.naturalHeight || media.height;
+      if(!mw || !mh) return;
+
+      const scale = Math.min(cw / mw, ch / mh);
+      const dw = mw * scale;
+      const dh = mh * scale;
+      const dx = (cw - dw) / 2;
+      const dy = (ch - dh) / 2;
+      ctx.setTransform(1,0,0,1,0,0);
+      ctx.clearRect(0,0,cw,ch);
+      ctx.drawImage(media, dx, dy, dw, dh);
+    }
+
+    function avg(points){
+      let x=0,y=0;
+      for(const p of points){ x+=p.x; y+=p.y; }
+      return {x:x/points.length, y:y/points.length};
+    }
+
+    function drawLandmarks(lm, ctx){
+      const W = ctx.canvas.width, H = ctx.canvas.height;
+      ctx.save();
+      ctx.globalAlpha = 0.75;
+      ctx.fillStyle = "rgba(255,211,110,.9)";
+      for(let i=0;i<lm.length;i++){
+        const x = lm[i].x*W, y = lm[i].y*H;
+        ctx.fillRect(x-1, y-1, 2, 2);
+      }
+      ctx.restore();
+    }
+
+    function polygonClip(ctx, poly){
+      ctx.beginPath();
+      ctx.moveTo(poly[0].x, poly[0].y);
+      for(let i=1;i<poly.length;i++) ctx.lineTo(poly[i].x, poly[i].y);
+      ctx.closePath();
+      ctx.clip();
+    }
+    function polygonFill(ctx, poly){
+      ctx.beginPath();
+      ctx.moveTo(poly[0].x, poly[0].y);
+      for(let i=1;i<poly.length;i++) ctx.lineTo(poly[i].x, poly[i].y);
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    function regionScale(ctx, center, w, h, sx, sy){
+      const x = Math.round(center.x - w/2);
+      const y = Math.round(center.y - h/2);
+      const tw = Math.round(w);
+      const th = Math.round(h);
+
+      const tmp = document.createElement('canvas');
+      tmp.width = tw; tmp.height = th;
+      tmp.getContext('2d').drawImage(ctx.canvas, x, y, tw, th, 0, 0, tw, th);
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.ellipse(center.x, center.y, w*0.49, h*0.49, 0, 0, Math.PI*2);
+      ctx.clip();
+
+      const dw = tw*sx, dh = th*sy;
+      ctx.drawImage(tmp, center.x - dw/2, center.y - dh/2, dw, dh);
+
+      ctx.restore();
+    }
+
+    function shiftRegion(ctx, center, w, h, dx){
+      const x = Math.round(center.x - w/2);
+      const y = Math.round(center.y - h/2);
+      const tw = Math.round(w);
+      const th = Math.round(h);
+
+      const tmp = document.createElement('canvas');
+      tmp.width = tw; tmp.height = th;
+      tmp.getContext('2d').drawImage(ctx.canvas, x, y, tw, th, 0, 0, tw, th);
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.ellipse(center.x, center.y, w*0.49, h*0.49, 0, 0, Math.PI*2);
+      ctx.clip();
+
+      ctx.drawImage(tmp, x + dx, y, tw, th);
+      ctx.restore();
+    }
+
+    // softPinch: sliced warp; dir=+1 inward right, -1 inward left, 0 symmetric inward to center
+    function softPinch(ctx, center, w, h, strength, dir, HQ){
+      const x = Math.round(center.x - w/2);
+      const y = Math.round(center.y - h/2);
+      const tw = Math.round(w);
+      const th = Math.round(h);
+
+      const tmp = document.createElement('canvas');
+      tmp.width = tw; tmp.height = th;
+      tmp.getContext('2d').drawImage(ctx.canvas, x, y, tw, th, 0, 0, tw, th);
+
+      const slices = HQ ? 38 : 28;
+      const sliceW = Math.max(2, Math.floor(tw / slices));
+      const maxShift = strength * 0.22 * tw;
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.ellipse(center.x, center.y, w*0.49, h*0.49, 0, 0, Math.PI*2);
+      ctx.clip();
+
+      for(let i=0;i<slices;i++){
+        const sx = i*sliceW;
+        const sw = (i===slices-1) ? (tw - sx) : sliceW;
+
+        const t = i/(slices-1); // 0..1 across region
+
+        let edge;
+        if(dir === +1) edge = (1 - t);          // outer edge on left
+        else if(dir === -1) edge = t;           // outer edge on right
+        else edge = Math.abs(t - 0.5) * 2;      // both edges
+        const wgt = Math.pow(edge, 1.55);
+
+        let shift = maxShift * wgt;
+        if(dir === +1) shift = +shift;
+        else if(dir === -1) shift = -shift;
+        else shift = (t<0.5) ? +shift : -shift; // symmetric toward center
+
+        ctx.drawImage(tmp, sx, 0, sw, th, x + sx + shift, y, sw, th);
+      }
+      ctx.restore();
+    }
+
+    function applySkin(ctx, facePoly, amount, HQ){
+      const passes = HQ ? Math.round(3 + amount*7) : Math.round(2 + amount*4);
+      const alpha = HQ ? (0.05 + amount*0.11) : (0.045 + amount*0.08);
+
+      ctx.save();
+      polygonClip(ctx, facePoly);
+
+      ctx.globalAlpha = alpha;
+      for(let i=0;i<passes;i++){
+        const s = 1 + (i+1) * (HQ ? 0.0035 : 0.0023) * amount;
+        ctx.save();
+        ctx.translate(ctx.canvas.width/2, ctx.canvas.height/2);
+        ctx.scale(s, s);
+        ctx.translate(-ctx.canvas.width/2, -ctx.canvas.height/2);
+        ctx.drawImage(ctx.canvas, 0, 0);
+        ctx.restore();
+      }
+
+      // tone lift + tiny highlight
+      ctx.globalAlpha = 0.06 + amount*0.16;
+      ctx.fillStyle = "rgba(255,235,240,0.35)";
+      ctx.fillRect(0,0,ctx.canvas.width, ctx.canvas.height);
+
+      ctx.globalAlpha = 0.05 + amount*0.10;
+      ctx.fillStyle = "rgba(255,255,255,0.20)";
+      ctx.fillRect(0,0,ctx.canvas.width, ctx.canvas.height);
+
+      ctx.restore();
+      ctx.globalAlpha = 1;
+    }
+
+    function radialGlow(ctx, x, y, r, color){
+      const g = ctx.createRadialGradient(x,y, 0, x,y, r);
+      g.addColorStop(0, color);
+      g.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.arc(x,y,r,0,Math.PI*2);
+      ctx.fill();
+    }
+
+    function applyContourHighlight(ctx, cfg){
+      const {faceOval, noseBridge, noseTip, leftCheek, rightCheek, chinTip, contourV, noseHV, HQ} = cfg;
+
+      ctx.save();
+      polygonClip(ctx, faceOval);
+
+      // contour (stronger)
+      if(contourV > 0.001){
+        const a = contourV * (HQ ? 0.30 : 0.22);
+        ctx.globalAlpha = a;
+
+        radialGlow(ctx, leftCheek.x - 160, leftCheek.y + 140, HQ ? 320 : 260, "rgba(35,15,20,0.55)");
+        radialGlow(ctx, rightCheek.x + 160, rightCheek.y + 140, HQ ? 320 : 260, "rgba(35,15,20,0.55)");
+
+        radialGlow(ctx, leftCheek.x - 70, leftCheek.y + 40, HQ ? 260 : 220, "rgba(45,18,22,0.45)");
+        radialGlow(ctx, rightCheek.x + 70, rightCheek.y + 40, HQ ? 260 : 220, "rgba(45,18,22,0.45)");
+
+        radialGlow(ctx, chinTip.x, chinTip.y + 70, HQ ? 280 : 240, "rgba(40,18,22,0.55)");
+        ctx.globalAlpha = 1;
+      }
+
+      // nose height (highlight + side shading)
+      if(noseHV > 0.001){
+        const a = noseHV * (HQ ? 0.50 : 0.36);
+        ctx.globalAlpha = a;
+
+        const g = ctx.createLinearGradient(noseBridge.x, noseBridge.y - 140, noseTip.x, noseTip.y + 160);
+        g.addColorStop(0, "rgba(255,255,255,0.00)");
+        g.addColorStop(0.35, "rgba(255,255,255,0.55)");
+        g.addColorStop(0.65, "rgba(255,255,255,0.28)");
+        g.addColorStop(1, "rgba(255,255,255,0.00)");
+        ctx.fillStyle = g;
+        roundRectFill(ctx, noseBridge.x - 18, noseBridge.y - 110, 36, 280, 18);
+
+        // side shadows
+        ctx.globalAlpha = a*0.62;
+        radialGlow(ctx, noseTip.x - 48, noseTip.y + 22, HQ ? 150 : 130, "rgba(35,14,18,0.55)");
+        radialGlow(ctx, noseTip.x + 48, noseTip.y + 22, HQ ? 150 : 130, "rgba(35,14,18,0.55)");
+
+        // tip highlight
+        ctx.globalAlpha = a*0.62;
+        radialGlow(ctx, noseTip.x, noseTip.y + 12, HQ ? 105 : 90, "rgba(255,255,255,0.35)");
+
+        ctx.globalAlpha = 1;
+      }
+
+      // cheekbone highlight (2.5D pop)
+      ctx.globalAlpha = (HQ ? 0.10 : 0.08) * (0.6 + contourV);
+      radialGlow(ctx, leftCheek.x - 20, leftCheek.y - 10, HQ ? 230 : 190, "rgba(255,255,255,0.20)");
+      radialGlow(ctx, rightCheek.x + 20, rightCheek.y - 10, HQ ? 230 : 190, "rgba(255,255,255,0.20)");
+      ctx.globalAlpha = 1;
+
+      ctx.restore();
+    }
+
+    function applyBlush(ctx, leftCheek, rightCheek, amount, HQ){
+      const a = amount * (HQ ? 0.38 : 0.28);
+      ctx.save();
+      ctx.globalAlpha = a;
+      radialGlow(ctx, leftCheek.x - 18, leftCheek.y + 30, HQ ? 190 : 160, "rgba(255,80,120,0.55)");
+      radialGlow(ctx, rightCheek.x + 18, rightCheek.y + 30, HQ ? 190 : 160, "rgba(255,80,120,0.55)");
+      ctx.restore();
+    }
+
+    function applyEyeliner(ctx, lm, amount){
+      const W = ctx.canvas.width, H = ctx.canvas.height;
+      const a = amount; // already 0..1
+      if(a <= 0.001) return;
+
+      const P = (i)=>({x: lm[i].x*W, y: lm[i].y*H});
+      const leftUpper  = [33, 160, 158, 157, 173, 133];
+      const rightUpper = [362, 385, 387, 386, 384, 263];
+
+      ctx.save();
+      ctx.globalAlpha = 0.12 + a*0.65;
+      ctx.strokeStyle = "rgba(8,8,12,0.95)";
+      ctx.lineWidth = 2.2 + a*3.2;
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+
+      strokePath(leftUpper.map(P));
+      strokePath(rightUpper.map(P));
+
+      // wing
+      ctx.globalAlpha = 0.10 + a*0.60;
+      wing(P(33), P(133), +1);
+      wing(P(362), P(263), -1);
+
+      ctx.restore();
+
+      function strokePath(pts){
+        ctx.beginPath();
+        ctx.moveTo(pts[0].x, pts[0].y);
+        for(let i=1;i<pts.length;i++) ctx.lineTo(pts[i].x, pts[i].y);
+        ctx.stroke();
+      }
+      function wing(outer, inner, dir){
+        const dx = outer.x - inner.x;
+        const dy = outer.y - inner.y;
+        const len = Math.hypot(dx,dy) || 1;
+        const nx = (dx/len), ny = (dy/len);
+        const wx = outer.x + nx*18 + dir*4;
+        const wy = outer.y + ny*10 - 6;
+        ctx.beginPath();
+        ctx.moveTo(outer.x, outer.y);
+        ctx.lineTo(wx, wy);
+        ctx.stroke();
+      }
+    }
+
+    function applyLips(ctx, lm, hex, strength, glossAmount, HQ){
+      const W = ctx.canvas.width, H = ctx.canvas.height;
+      const P = (i)=>({x: lm[i].x*W, y: lm[i].y*H});
+
+      const lipOuter = [61,185,40,39,37,0,267,269,270,409,291,375,321,405,314,17,84,181,91,146];
+      const poly = lipOuter.map(P);
+
+      ctx.save();
+
+      // base fill
+      ctx.globalAlpha = clamp01(strength);
+      ctx.fillStyle = hexToRgba(hex, 0.90);
+      polygonFill(ctx, poly);
+
+      // soften edges
+      ctx.globalAlpha = (HQ ? 0.16 : 0.12) + 0.20*clamp01(strength);
+      ctx.filter = `blur(${HQ ? 1.6 : 1.1}px)`;
+      polygonFill(ctx, poly);
+      ctx.filter = "none";
+
+      // inner gradient for “3D lip”
+      ctx.globalAlpha = 0.16 + 0.28*clamp01(strength);
+      const m = avg([P(13), P(14), P(78), P(308)]);
+      radialGlow(ctx, m.x, m.y + 18, HQ ? 150 : 120, "rgba(255,255,255,0.18)");
+
+      // gloss highlight
+      if(glossAmount > 0.001){
+        ctx.globalAlpha = glossAmount * (HQ ? 0.45 : 0.34);
+        const topC = avg([P(13), P(0), P(267)]);
+        radialGlow(ctx, topC.x, topC.y + 10, HQ ? 140 : 110, "rgba(255,255,255,0.38)");
+      }
+
+      ctx.restore();
+    }
+
+    function clamp01(x){ return Math.max(0, Math.min(1, x)); }
+    function hexToRgba(hex, a){
+      const h = hex.replace('#','').trim();
+      const r = parseInt(h.substring(0,2), 16);
+      const g = parseInt(h.substring(2,4), 16);
+      const b = parseInt(h.substring(4,6), 16);
+      return `rgba(${r},${g},${b},${a})`;
+    }
+    function roundRectFill(ctx, x, y, w, h, r){
+      ctx.beginPath();
+      ctx.moveTo(x+r,y);
+      ctx.arcTo(x+w,y,x+w,y+h,r);
+      ctx.arcTo(x+w,y+h,x,y+h,r);
+      ctx.arcTo(x,y+h,x,y,r);
+      ctx.arcTo(x,y,x+w,y,r);
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    // ----- Hair overlay (big visual change) -----
+    function drawHairOverlay(ctx, lm, style, colorHex, HQ){
+      const W = ctx.canvas.width, H = ctx.canvas.height;
+      const P = (i)=>({x: lm[i].x*W, y: lm[i].y*H});
+
+      // face oval points
+      const faceIdx = [10,338,297,332,284,251,389,356,454,323,361,288,397,365,379,378,400,377,152,148,176,149,150,136,172,58,132,93,234,127,162,21,54,103,67,109];
+      const face = faceIdx.map(P);
+
+      // key points
+      const forehead = P(10);
+      const chin = P(152);
+      const leftTemple = P(109);
+      const rightTemple = P(338);
+      const leftJaw = P(234);
+      const rightJaw = P(454);
+
+      // approximate head box
+      const faceBox = bounds(face);
+      const headTopY = Math.max(0, faceBox.yMin - (faceBox.h * 0.55));
+      const headW = faceBox.w * 1.35;
+      const headX = faceBox.cx - headW/2;
+
+      ctx.save();
+
+      // shadow behind hair for depth
+      ctx.globalAlpha = HQ ? 0.25 : 0.20;
+      ctx.filter = `blur(${HQ ? 6 : 4}px)`;
+      ctx.fillStyle = "rgba(0,0,0,0.55)";
+      ctx.beginPath();
+      ctx.ellipse(faceBox.cx, faceBox.yMin + faceBox.h*0.25, headW*0.50, faceBox.h*0.70, 0, 0, Math.PI*2);
+      ctx.fill();
+      ctx.filter = "none";
+
+      // hair base gradient
+      const base = ctx.createLinearGradient(0, headTopY, 0, faceBox.yMax + faceBox.h*0.35);
+      base.addColorStop(0, hexToRgba(colorHex, 0.95));
+      base.addColorStop(0.6, hexToRgba(colorHex, 0.88));
+      base.addColorStop(1, "rgba(0,0,0,0.55)");
+
+      // hair shape depending on style
+      ctx.globalAlpha = 0.98;
+      ctx.fillStyle = base;
+
+      if(style === 'bangs'){
+        // cap + bangs
+        hairCap(ctx, headX, headTopY, headW, faceBox.h*0.95, 0.52);
+        // bangs: multiple strands across forehead
+        bangs(ctx, leftTemple, rightTemple, forehead, faceBox.h*0.20);
+      } else if(style === 'bob'){
+        // bob: cap + rounded sides down to jaw
+        hairCap(ctx, headX, headTopY, headW, faceBox.h*0.95, 0.55);
+        bobSides(ctx, leftJaw, rightJaw, chin, faceBox.h*0.15);
+      } else if(style === 'long'){
+        // long: cap + long drapes
+        hairCap(ctx, headX, headTopY, headW, faceBox.h*1.10, 0.58);
+        longDrape(ctx, leftTemple, rightTemple, chin, faceBox.h*0.55);
+        bangs(ctx, leftTemple, rightTemple, forehead, faceBox.h*0.12); // light bangs for realism
+      }
+
+      // hair shine (adds 3D feel)
+      ctx.globalAlpha = HQ ? 0.18 : 0.14;
+      ctx.filter = `blur(${HQ ? 8 : 6}px)`;
+      const shine = ctx.createLinearGradient(faceBox.cx - headW*0.25, headTopY, faceBox.cx + headW*0.15, headTopY + faceBox.h);
+      shine.addColorStop(0, "rgba(255,255,255,0.00)");
+      shine.addColorStop(0.4, "rgba(255,255,255,0.22)");
+      shine.addColorStop(0.8, "rgba(255,255,255,0.02)");
+      ctx.fillStyle = shine;
+      ctx.beginPath();
+      ctx.ellipse(faceBox.cx - headW*0.10, headTopY + faceBox.h*0.35, headW*0.22, faceBox.h*0.45, -0.12, 0, Math.PI*2);
+      ctx.fill();
+      ctx.filter = "none";
+
+      // clip hair so it doesn’t paint over face too much: subtract face area a little (soft)
+      ctx.globalCompositeOperation = "destination-out";
+      ctx.globalAlpha = 0.25;
+      ctx.filter = `blur(${HQ ? 10 : 7}px)`;
+      polygonFill(ctx, face);
+      ctx.filter = "none";
+      ctx.globalCompositeOperation = "source-over";
+
+      ctx.restore();
+
+      function hairCap(ctx, x, y, w, h, round){
+        ctx.beginPath();
+        ctx.moveTo(x + w*0.10, y + h*0.35);
+        ctx.bezierCurveTo(x + w*0.18, y + h*0.05, x + w*0.82, y + h*0.05, x + w*0.90, y + h*0.35);
+        ctx.bezierCurveTo(x + w*0.98, y + h*(0.70+round*0.12), x + w*0.70, y + h*0.95, x + w*0.50, y + h*0.98);
+        ctx.bezierCurveTo(x + w*0.30, y + h*0.95, x + w*0.02, y + h*(0.70+round*0.12), x + w*0.10, y + h*0.35);
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      function bangs(ctx, L, R, F, depth){
+        const topY = Math.min(L.y, R.y, F.y) + depth*0.10;
+        const bottomY = F.y + depth*0.55;
+        const leftX = L.x - (R.x-L.x)*0.06;
+        const rightX = R.x + (R.x-L.x)*0.06;
+
+        // main bangs mass
+        ctx.beginPath();
+        ctx.moveTo(leftX, topY);
+        ctx.bezierCurveTo(leftX + (rightX-leftX)*0.25, bottomY - depth*0.55, rightX - (rightX-leftX)*0.25, bottomY - depth*0.55, rightX, topY);
+        ctx.bezierCurveTo(rightX - (rightX-leftX)*0.10, bottomY + depth*0.15, leftX + (rightX-leftX)*0.10, bottomY + depth*0.15, leftX, topY);
+        ctx.closePath();
+        ctx.fill();
+
+        // strands (more “티”)
+        ctx.save();
+        ctx.globalAlpha *= 0.35;
+        ctx.strokeStyle = "rgba(0,0,0,0.28)";
+        ctx.lineWidth = 2;
+        for(let i=0;i<9;i++){
+          const t = i/8;
+          const x = leftX*(1-t) + rightX*t;
+          ctx.beginPath();
+          ctx.moveTo(x, topY);
+          ctx.quadraticCurveTo(x + (Math.random()*12-6), bottomY, x + (Math.random()*18-9), bottomY + depth*0.12);
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+
+      function bobSides(ctx, LJ, RJ, chin, extra){
+        const y1 = Math.min(LJ.y, RJ.y) - extra*0.25;
+        const y2 = chin.y + extra*0.10;
+
+        // left side
+        ctx.beginPath();
+        ctx.moveTo(LJ.x - 60, y1);
+        ctx.quadraticCurveTo(LJ.x - 120, (y1+y2)/2, LJ.x - 40, y2);
+        ctx.quadraticCurveTo(LJ.x + 10, y2 - 10, LJ.x - 10, y1 + 40);
+        ctx.closePath();
+        ctx.fill();
+
+        // right side
+        ctx.beginPath();
+        ctx.moveTo(RJ.x + 60, y1);
+        ctx.quadraticCurveTo(RJ.x + 120, (y1+y2)/2, RJ.x + 40, y2);
+        ctx.quadraticCurveTo(RJ.x - 10, y2 - 10, RJ.x + 10, y1 + 40);
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      function longDrape(ctx, L, R, chin, len){
+        const yTop = Math.min(L.y, R.y) - 30;
+        const yBot = chin.y + len;
+
+        // left drape
+        ctx.beginPath();
+        ctx.moveTo(L.x - 40, yTop);
+        ctx.bezierCurveTo(L.x - 200, yTop + len*0.25, L.x - 180, yBot - len*0.15, L.x - 70, yBot);
+        ctx.bezierCurveTo(L.x - 20, yBot - 20, L.x + 40, yTop + 80, L.x - 40, yTop);
+        ctx.closePath();
+        ctx.fill();
+
+        // right drape
+        ctx.beginPath();
+        ctx.moveTo(R.x + 40, yTop);
+        ctx.bezierCurveTo(R.x + 200, yTop + len*0.25, R.x + 180, yBot - len*0.15, R.x + 70, yBot);
+        ctx.bezierCurveTo(R.x + 20, yBot - 20, R.x - 40, yTop + 80, R.x + 40, yTop);
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      function bounds(pts){
+        let xMin=1e9,yMin=1e9,xMax=-1e9,yMax=-1e9;
+        for(const p of pts){
+          xMin = Math.min(xMin, p.x);
+          yMin = Math.min(yMin, p.y);
+          xMax = Math.max(xMax, p.x);
+          yMax = Math.max(yMax, p.y);
+        }
+        const w = xMax-xMin, h=yMax-yMin;
+        return {xMin,yMin,xMax,yMax,w,h,cx:(xMin+xMax)/2, cy:(yMin+yMax)/2};
+      }
+    }
+
+    // ----- Accessories -----
+    function drawGlasses(ctx, leftEye, rightEye){
+      const dx = rightEye.x - leftEye.x;
+      const dy = rightEye.y - leftEye.y;
+      const dist = Math.hypot(dx, dy);
+      const angle = Math.atan2(dy, dx);
+
+      const frameW = dist * 2.20;
+      const frameH = dist * 0.75;
+      const bridgeW = dist * 0.22;
+
+      ctx.save();
+      ctx.translate((leftEye.x + rightEye.x)/2, (leftEye.y + rightEye.y)/2);
+      ctx.rotate(angle);
+      ctx.globalAlpha = 0.92;
+
+      const lw = Math.max(2.5, dist*0.05);
+      ctx.lineWidth = lw;
+      ctx.strokeStyle = "rgba(255,255,255,.86)";
+      ctx.fillStyle = "rgba(0,0,0,.12)";
+
+      const lensW = (frameW - bridgeW) / 2;
+      const lensH = frameH;
+
+      rr(-frameW/2, -lensH/2, lensW, lensH, lensH*0.28); ctx.fill(); ctx.stroke();
+      rr(frameW/2 - lensW, -lensH/2, lensW, lensH, lensH*0.28); ctx.fill(); ctx.stroke();
+
+      ctx.beginPath(); ctx.moveTo(-bridgeW/2, 0); ctx.lineTo(bridgeW/2, 0); ctx.stroke();
+
+      ctx.globalAlpha = 0.78;
+      ctx.beginPath();
+      ctx.moveTo(-frameW/2, -lensH*0.06); ctx.lineTo(-frameW/2 - dist*0.65, -lensH*0.20);
+      ctx.moveTo(frameW/2, -lensH*0.06);  ctx.lineTo(frameW/2 + dist*0.65, -lensH*0.20);
+      ctx.stroke();
+
+      ctx.restore();
+
+      function rr(x,y,w,h,r){
+        ctx.beginPath();
+        ctx.moveTo(x+r,y);
+        ctx.arcTo(x+w,y,x+w,y+h,r);
+        ctx.arcTo(x+w,y+h,x,y+h,r);
+        ctx.arcTo(x,y+h,x,y,r);
+        ctx.arcTo(x,y,x+w,y,r);
+        ctx.closePath();
+      }
+    }
+
+    function drawEarrings(ctx, leftJaw, rightJaw, HQ){
+      ctx.save();
+      ctx.globalAlpha = 0.90;
+      const r = ctx.canvas.width * 0.0068;
+
+      const g = ctx.createLinearGradient(0,0,0, ctx.canvas.height);
+      g.addColorStop(0, "rgba(255,226,140,.95)");
+      g.addColorStop(1, "rgba(255,170,90,.85)");
+      ctx.fillStyle = g;
+      ctx.strokeStyle = "rgba(255,255,255,.25)";
+      ctx.lineWidth = 2;
+
+      drop(leftJaw.x, leftJaw.y + ctx.canvas.height*0.035);
+      drop(rightJaw.x, rightJaw.y + ctx.canvas.height*0.035);
+
+      ctx.restore();
+
+      function drop(x,y){
+        ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x, y+r); ctx.lineTo(x, y+r*(HQ?6.4:6.0)); ctx.stroke();
+        ctx.beginPath(); ctx.arc(x, y+r*(HQ?7.9:7.3), r*1.35, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+        radialGlow(ctx, x + r*1.2, y + r*(HQ?7.5:6.9), r*4.0, "rgba(255,255,255,0.35)");
+      }
+    }
+
+    // ----- Boot -----
+    setValLabels();
+  </script>
 </body>
 </html>
