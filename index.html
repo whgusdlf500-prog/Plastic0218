@@ -478,6 +478,12 @@
             </div>
           </div>
 
+          <div class="control">
+            <div class="top"><div class="name">턱 Shape</div><div class="val" id="vJawShape">0</div></div>
+            <input type="range" id="jawShape" min="-50" max="50" value="0">
+            <div class="desc">음수는 부드러운 V라인, 양수는 각진 턱 라인으로 조절</div>
+          </div>
+
           <div class="split makeup-control">
             <div class="control">
               <div class="top"><div class="name">피부 보정</div><div class="val" id="vSkin">35</div></div>
@@ -688,7 +694,7 @@
     const power = $('power');
     const eye = $('eye'), eyeSpace = $('eyeSpace');
     const noseW = $('noseW'), noseH = $('noseH');
-    const lip = $('lip'), slim = $('slim');
+    const lip = $('lip'), slim = $('slim'), jawShape = $('jawShape');
     const skin = $('skin'), contour = $('contour'), blush = $('blush'), liner = $('liner'), gloss = $('gloss');
     const lipColor = $('lipColor');
     const hairStyle = $('hairStyle');
@@ -700,7 +706,7 @@
     const vPower = $('vPower');
     const vEye = $('vEye'), vEyeSpace = $('vEyeSpace');
     const vNoseW = $('vNoseW'), vNoseH = $('vNoseH');
-    const vLip = $('vLip'), vSlim = $('vSlim');
+    const vLip = $('vLip'), vSlim = $('vSlim'), vJawShape = $('vJawShape');
     const vSkin = $('vSkin'), vContour = $('vContour'), vBlush = $('vBlush'), vLiner = $('vLiner'), vGloss = $('vGloss');
     const vLipColor = $('vLipColor'), vHairStyle = $('vHairStyle'), vHairColor = $('vHairColor'), vAcc = $('vAcc');
     const lookName = $('lookName');
@@ -721,6 +727,7 @@
     let usingCamera = false;
     let camera = null;
     let lastLandmarks = null;
+    let smoothLandmarks = null;
     let lastFrameCanvas = null;
     let lastProcessAt = 0;
     let currentLang = 'ko';
@@ -1134,6 +1141,7 @@
       const noseWV = params.noseWV;
       const lipScale = params.lipScale;
       const slimV = params.slimV;
+      const jawShapeV = params.jawShapeV || 0;
       const pwr = params.power;
 
       const W = glC.width;
@@ -1152,14 +1160,17 @@
         let v = Pt(i);
 
         // mild localized deformation for realism
-        morph3DVertex(v, leftEyeC, eyeScale*0.55, 0.20, 0.13, 1.0, 0.75);
-        morph3DVertex(v, rightEyeC, eyeScale*0.55, 0.20, 0.13, 1.0, 0.75);
-        shift3DVertex(v, leftEyeC, Math.abs(eyeSpaceV)*0.9, 0.24, 0.15, -eyeSpaceV*0.32, 0);
-        shift3DVertex(v, rightEyeC, Math.abs(eyeSpaceV)*0.9, 0.24, 0.15, +eyeSpaceV*0.32, 0);
-        morph3DVertex(v, noseC, Math.abs(noseWV)*0.7, 0.18, 0.30, noseWV*0.65, 0.0);
-        morph3DVertex(v, lipC, lipScale*0.65, 0.26, 0.15, 0.9, 0.65);
-        shift3DVertex(v, jawL, slimV*0.55, 0.20, 0.20, slimV*0.11, 0);
-        shift3DVertex(v, jawR, slimV*0.55, 0.20, 0.20, -slimV*0.11, 0);
+        morph3DVertex(v, leftEyeC, eyeScale*0.62, 0.20, 0.13, 1.0, 0.78);
+        morph3DVertex(v, rightEyeC, eyeScale*0.62, 0.20, 0.13, 1.0, 0.78);
+        shift3DVertex(v, leftEyeC, Math.abs(eyeSpaceV)*1.0, 0.24, 0.15, -eyeSpaceV*0.36, 0);
+        shift3DVertex(v, rightEyeC, Math.abs(eyeSpaceV)*1.0, 0.24, 0.15, +eyeSpaceV*0.36, 0);
+        morph3DVertex(v, noseC, Math.abs(noseWV)*0.78, 0.18, 0.30, noseWV*0.70, 0.0);
+        morph3DVertex(v, lipC, lipScale*0.72, 0.26, 0.15, 0.95, 0.70);
+        shift3DVertex(v, jawL, slimV*0.60, 0.20, 0.20, slimV*0.12, 0);
+        shift3DVertex(v, jawR, slimV*0.60, 0.20, 0.20, -slimV*0.12, 0);
+        shift3DVertex(v, jawL, Math.abs(jawShapeV)*0.70, 0.24, 0.20, -jawShapeV*0.12, jawShapeV*0.03);
+        shift3DVertex(v, jawR, Math.abs(jawShapeV)*0.70, 0.24, 0.20, +jawShapeV*0.12, jawShapeV*0.03);
+        shift3DVertex(v, lipC, Math.abs(jawShapeV)*0.35, 0.26, 0.22, 0, -jawShapeV*0.03);
 
         // pseudo-depth enhancement for 3D feel
         const centerBias = Math.exp(-((v.x*v.x)/0.14 + (v.y*v.y)/0.35));
@@ -1192,6 +1203,7 @@
         100 - Math.min(100, Math.abs(Number(noseH.value) - 52) * 1.4),
         100 - Math.min(100, Math.abs(Number(lip.value) - 18) * 1.9),
         100 - Math.min(100, Math.abs(Number(slim.value) - 34) * 1.4),
+        100 - Math.min(100, Math.abs(Number(jawShape.value) - 0) * 1.2),
         100 - Math.min(100, Math.abs(Number(contour.value) - 33) * 1.5),
         100 - Math.min(100, Math.abs(Number(gloss.value) - 44) * 1.2)
       ];
@@ -1207,6 +1219,7 @@
       noseH.value = settings.noseH;
       lip.value = settings.lip;
       slim.value = settings.slim;
+      jawShape.value = settings.jawShape ?? 0;
       skin.value = settings.skin;
       contour.value = settings.contour;
       blush.value = settings.blush;
@@ -1244,7 +1257,7 @@
         score,
         settings: {
           power: Number(power.value), eye: Number(eye.value), eyeSpace: Number(eyeSpace.value),
-          noseW: Number(noseW.value), noseH: Number(noseH.value), lip: Number(lip.value), slim: Number(slim.value),
+          noseW: Number(noseW.value), noseH: Number(noseH.value), lip: Number(lip.value), slim: Number(slim.value), jawShape: Number(jawShape.value),
           skin: Number(skin.value), contour: Number(contour.value), blush: Number(blush.value), liner: Number(liner.value), gloss: Number(gloss.value),
           hairStyle: hairStyle.value, hairColor: hairColor.value, lipColor: lipColor.value, glasses: glasses.checked, earrings: earrings.checked
         }
@@ -1414,7 +1427,7 @@
     // ----- UI bindings -----
     const inputs = [
       chkMirror, chkLandmarks, chkHQ, chk3D,
-      power, eye, eyeSpace, noseW, noseH, lip, slim,
+      power, eye, eyeSpace, noseW, noseH, lip, slim, jawShape,
       skin, contour, blush, liner, gloss,
       lipColor, hairStyle, hairColor,
       glasses, earrings
@@ -1487,6 +1500,7 @@
     btnReset.addEventListener('click', async ()=>{
       applyPreset('natural');
       lastLandmarks = null;
+      smoothLandmarks = null;
       lastFrameCanvas = null;
 
       if(usingCamera) await stopCamera();
@@ -1517,6 +1531,7 @@
       vNoseH.textContent = noseH.value;
       vLip.textContent = lip.value;
       vSlim.textContent = slim.value;
+      vJawShape.textContent = jawShape.value;
       vSkin.textContent = skin.value;
       vContour.textContent = contour.value;
       vBlush.textContent = blush.value;
@@ -1533,7 +1548,7 @@
         power.value = 36;
         eye.value = 8; eyeSpace.value = 2;
         noseW.value = -4; noseH.value = 24;
-        lip.value = 8; slim.value = 14;
+        lip.value = 8; slim.value = 14; jawShape.value = -6;
         skin.value = 24; contour.value = 16; blush.value = 12; liner.value = 18; gloss.value = 20;
         hairStyle.value = "none";
         glasses.checked = false; earrings.checked = false;
@@ -1542,7 +1557,7 @@
         power.value = 56;
         eye.value = 15; eyeSpace.value = 4;
         noseW.value = -7; noseH.value = 38;
-        lip.value = 13; slim.value = 24;
+        lip.value = 13; slim.value = 24; jawShape.value = 8;
         skin.value = 30; contour.value = 24; blush.value = 18; liner.value = 28; gloss.value = 30;
         hairStyle.value = "bob";
         glasses.checked = false; earrings.checked = true;
@@ -1551,7 +1566,7 @@
         power.value = 52;
         eye.value = 12; eyeSpace.value = 3;
         noseW.value = -6; noseH.value = 44;
-        lip.value = 12; slim.value = 20;
+        lip.value = 12; slim.value = 20; jawShape.value = -2;
         skin.value = 36; contour.value = 18; blush.value = 16; liner.value = 22; gloss.value = 44;
         hairStyle.value = "long";
         glasses.checked = false; earrings.checked = true;
@@ -1615,7 +1630,8 @@
 
     // ----- FaceMesh results -----
     function onResults(results){
-      lastLandmarks = results.multiFaceLandmarks?.[0] || null;
+      const rawLm = results.multiFaceLandmarks?.[0] || null;
+      lastLandmarks = stabilizeLandmarks(rawLm);
       lastFrameCanvas = src;
       setActions(true);
       renderAll();
@@ -1681,22 +1697,23 @@
       const faceOval = faceOvalIdx.map(Pt);
 
       // parameters (scaled by power)
-      const eyeScale = (Number(eye.value)/100) * (0.18 + 0.32*PWR);
-      const eyeSpaceV= (Number(eyeSpace.value)/100) * (0.14 + 0.24*PWR);
+      const eyeScale = (Number(eye.value)/100) * (0.20 + 0.36*PWR);
+      const eyeSpaceV= (Number(eyeSpace.value)/100) * (0.16 + 0.28*PWR);
 
-      const noseWV = (Number(noseW.value)/100) * (0.16 + 0.28*PWR);
+      const noseWV = (Number(noseW.value)/100) * (0.18 + 0.32*PWR);
       const noseHV = (Number(noseH.value)/100) * (0.20 + 0.40*PWR);
 
-      const lipScale = (Number(lip.value)/100) * (0.16 + 0.30*PWR);
-      const slimV = (Number(slim.value)/100) * (0.18 + 0.34*PWR);
+      const lipScale = (Number(lip.value)/100) * (0.18 + 0.34*PWR);
+      const slimV = (Number(slim.value)/100) * (0.20 + 0.38*PWR);
+      const jawShapeV = (Number(jawShape.value)/100) * (0.28 + 0.42*PWR);
 
-      const contourV = (Number(slim.value)/100) * (0.18 + 0.30*PWR);
+      const contourV = (Number(slim.value)/100) * (0.20 + 0.34*PWR);
       const eyeMid = avg([leftEyeC, rightEyeC]);
       const faceYaw = clamp((noseTip.x - eyeMid.x) / Math.max(1, (rightEyeC.x - leftEyeC.x)), -0.7, 0.7);
 
       // 1) Geometry stage: real-time 3D mesh render (fallback: conservative 2D liquify)
       const rendered3D = render3DFace(lastFrameCanvas, lm, {
-        eyeScale, eyeSpaceV, noseWV, lipScale, slimV, power: PWR
+        eyeScale, eyeSpaceV, noseWV, lipScale, slimV, jawShapeV, power: PWR
       });
       if(rendered3D){
         actx.save();
@@ -1708,7 +1725,7 @@
         applyLandmarkLiquify(actx, {
           leftEyeC, rightEyeC, mouthC, noseTip,
           leftCheek, rightCheek, leftJawMid, rightJawMid, chinTip,
-          eyeScale, eyeSpaceV, noseWV, lipScale, slimV, faceYaw, power: PWR
+          eyeScale, eyeSpaceV, noseWV, lipScale, slimV, jawShapeV, faceYaw, power: PWR
         });
       }
 
@@ -1801,12 +1818,35 @@
       return out;
     }
 
+    function stabilizeLandmarks(rawLm){
+      if(!rawLm){
+        smoothLandmarks = null;
+        return null;
+      }
+      if(!smoothLandmarks || smoothLandmarks.length !== rawLm.length){
+        smoothLandmarks = rawLm.map(p => ({x:p.x, y:p.y, z:p.z || 0}));
+        return smoothLandmarks.map(p => ({x:p.x, y:p.y, z:p.z}));
+      }
+      const blend = 0.42; // lower = smoother, higher = faster response
+      const maxDelta = 0.028;
+      for(let i=0;i<rawLm.length;i++){
+        const prev = smoothLandmarks[i];
+        const nx = prev.x + (rawLm[i].x - prev.x) * blend;
+        const ny = prev.y + (rawLm[i].y - prev.y) * blend;
+        const nz = prev.z + ((rawLm[i].z || 0) - (prev.z || 0)) * blend;
+        prev.x += clamp(nx - prev.x, -maxDelta, maxDelta);
+        prev.y += clamp(ny - prev.y, -maxDelta, maxDelta);
+        prev.z += clamp(nz - prev.z, -maxDelta, maxDelta);
+      }
+      return smoothLandmarks.map(p => ({x:p.x, y:p.y, z:p.z}));
+    }
+
     function applyLandmarkLiquify(ctx, cfg){
       // Conservative landmark warp to preserve identity.
       const {
         leftEyeC, rightEyeC, mouthC, noseTip,
         leftCheek, rightCheek, leftJawMid, rightJawMid, chinTip,
-        eyeScale, eyeSpaceV, noseWV, lipScale, slimV, faceYaw=0, power=0.5
+        eyeScale, eyeSpaceV, noseWV, lipScale, slimV, jawShapeV=0, faceYaw=0, power=0.5
       } = cfg;
 
       const base = 0.75 + power*0.20;
@@ -1836,6 +1876,10 @@
         softPinch(ctx, leftJawMid,  150, 180, slimV*0.12*leftWeight, +1, false);
         softPinch(ctx, rightJawMid, 150, 180, slimV*0.12*rightWeight, -1, false);
         softPinch(ctx, chinTip, 190, 150, slimV*0.06*base, 0, false);
+      }
+      if(Math.abs(jawShapeV) > 0.0005){
+        shiftRegion(ctx, leftJawMid, 130, 120, -jawShapeV*20);
+        shiftRegion(ctx, rightJawMid, 130, 120, +jawShapeV*20);
       }
     }
 
