@@ -411,6 +411,7 @@
                 <label class="ck tiny"><input type="checkbox" id="chkMirror" checked> <span id="lblMirror">거울</span></label>
                 <label class="ck tiny"><input type="checkbox" id="chkLandmarks"> <span id="lblLandmarks">랜드마크</span></label>
                 <label class="ck tiny"><input type="checkbox" id="chkHQ" checked> <span id="lblHQ">고화질</span></label>
+                <label class="ck tiny"><input type="checkbox" id="chk3D" checked> <span id="lbl3D">3D 렌더</span></label>
               </div>
             </div>
 
@@ -626,6 +627,8 @@
   <!-- MediaPipe -->
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/delaunator@5.0.1/delaunator.min.js"></script>
 
   <script>
     // =========================================================
@@ -653,6 +656,11 @@
     afterC.width = view.width; afterC.height = view.height;
     const actx = afterC.getContext('2d');
 
+    // offscreen: 3D render
+    const glC = document.createElement('canvas');
+    glC.width = view.width; glC.height = view.height;
+    const glctx = glC.getContext('2d');
+
     const stage = $('stage');
     const divider = $('divider');
     const handle = $('handle');
@@ -665,6 +673,7 @@
     const chkMirror = $('chkMirror');
     const chkLandmarks = $('chkLandmarks');
     const chkHQ = $('chkHQ');
+    const chk3D = $('chk3D');
 
     const btnUseCamera = $('btnUseCamera');
     const btnSave = $('btnSave');
@@ -758,6 +767,7 @@
         lblMirror: '거울',
         lblLandmarks: '랜드마크',
         lblHQ: '고화질',
+        lbl3D: '3D 렌더',
         warnTitle: '면책',
         warnBody: '본 서비스는 오락 및 스타일 참고용 시뮬레이션입니다. 실제 시술/수술 결과를 예측하지 않습니다.',
         controlsTitle: '🎛️ 자연형 AI 뷰티 컨트롤',
@@ -800,6 +810,7 @@
         lblMirror: 'Mirror',
         lblLandmarks: 'Landmarks',
         lblHQ: 'High Quality',
+        lbl3D: '3D Render',
         warnTitle: 'Disclaimer',
         warnBody: 'This simulator is for entertainment/reference only. Actual cosmetic or styling outcomes may differ.',
         controlsTitle: '🎛️ Dramatic Controls',
@@ -842,6 +853,7 @@
         lblMirror: 'ミラー',
         lblLandmarks: 'ランドマーク',
         lblHQ: '高画質',
+        lbl3D: '3D レンダー',
         warnTitle: '免責',
         warnBody: '本シミュレーターは娯楽・参考用です。実際の施術/スタイリング結果とは異なる場合があります。',
         controlsTitle: '🎛️ 強調コントロール',
@@ -884,6 +896,7 @@
         lblMirror: 'Espejo',
         lblLandmarks: 'Puntos',
         lblHQ: 'Alta Calidad',
+        lbl3D: 'Render 3D',
         warnTitle: 'Aviso',
         warnBody: 'Este simulador es solo para entretenimiento/referencia. El resultado real puede variar.',
         controlsTitle: '🎛️ Controles Intensos',
@@ -926,6 +939,7 @@
         lblMirror: 'Miroir',
         lblLandmarks: 'Repères',
         lblHQ: 'Haute Qualité',
+        lbl3D: 'Rendu 3D',
         warnTitle: 'Avertissement',
         warnBody: 'Simulateur à but ludique/référence. Le résultat réel peut différer.',
         controlsTitle: '🎛️ Contrôles Renforcés',
@@ -968,6 +982,7 @@
         lblMirror: 'Spiegeln',
         lblLandmarks: 'Landmarks',
         lblHQ: 'Hohe Qualität',
+        lbl3D: '3D-Render',
         warnTitle: 'Hinweis',
         warnBody: 'Dieser Simulator dient nur zur Unterhaltung/Referenz. Reale Ergebnisse können abweichen.',
         controlsTitle: '🎛️ Deutliche Steuerung',
@@ -997,6 +1012,173 @@
 
     function clamp(v, min, max){
       return Math.max(min, Math.min(max, v));
+    }
+
+    const LEFT_EYE_IDX = [33,133,159,145,160,158,157,173];
+    const RIGHT_EYE_IDX = [362,263,386,374,385,387,384,398];
+    const NOSE_IDX = [1,2,4,5,6,19,94,168,197,195,98,327];
+    const LIP_IDX = [61,146,91,181,84,17,314,405,321,375,291,78,191,80,81,82,13,312,311,310,415];
+    const JAW_LEFT_IDX = [172,136,150,149,176,148];
+    const JAW_RIGHT_IDX = [397,365,379,378,400,377];
+
+    let threeRenderer = null;
+    let threeScene = null;
+    let threeCamera = null;
+    let threeMesh = null;
+    let threeTexture = null;
+    let triIndices = null;
+    let baseUV = null;
+    let threeInitialized = false;
+
+    function ensureThree(){
+      if(threeInitialized || !window.THREE || !window.Delaunator) return;
+      threeRenderer = new THREE.WebGLRenderer({canvas: glC, alpha: true, antialias: true, preserveDrawingBuffer: false});
+      threeRenderer.setSize(glC.width, glC.height, false);
+      threeRenderer.setPixelRatio(1);
+      threeRenderer.setClearColor(0x000000, 0);
+
+      threeScene = new THREE.Scene();
+      threeCamera = new THREE.PerspectiveCamera(33, glC.width / glC.height, 0.01, 20);
+      threeCamera.position.set(0, 0, 2.65);
+      threeScene.add(threeCamera);
+
+      const hemi = new THREE.HemisphereLight(0xffffff, 0x1a2030, 0.95);
+      threeScene.add(hemi);
+      const key = new THREE.DirectionalLight(0xffffff, 0.85);
+      key.position.set(0.6, 0.7, 1.2);
+      threeScene.add(key);
+      const fill = new THREE.DirectionalLight(0x9db4ff, 0.45);
+      fill.position.set(-0.8, 0.1, 0.6);
+      threeScene.add(fill);
+
+      threeInitialized = true;
+    }
+
+    function buildFaceMesh(lm){
+      ensureThree();
+      if(!threeInitialized || !lm) return;
+      const pts = lm.map(p => [p.x, p.y]);
+      const delaunay = Delaunator.from(pts);
+      triIndices = delaunay.triangles;
+
+      const geo = new THREE.BufferGeometry();
+      const pos = new Float32Array(lm.length * 3);
+      baseUV = new Float32Array(lm.length * 2);
+      for(let i=0;i<lm.length;i++){
+        const x = (lm[i].x - 0.5) * 2.0;
+        const y = -(lm[i].y - 0.5) * 2.0;
+        const z = -lm[i].z * 0.9;
+        pos[i*3] = x;
+        pos[i*3+1] = y;
+        pos[i*3+2] = z;
+        baseUV[i*2] = lm[i].x;
+        baseUV[i*2+1] = 1.0 - lm[i].y;
+      }
+      geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+      geo.setAttribute('uv', new THREE.BufferAttribute(baseUV, 2));
+      geo.setIndex(new THREE.BufferAttribute(new Uint16Array(triIndices), 1));
+      geo.computeVertexNormals();
+
+      threeTexture = new THREE.CanvasTexture(src);
+      threeTexture.minFilter = THREE.LinearFilter;
+      threeTexture.magFilter = THREE.LinearFilter;
+      threeTexture.flipY = false;
+
+      const mat = new THREE.MeshStandardMaterial({
+        map: threeTexture,
+        roughness: 0.72,
+        metalness: 0.02,
+        transparent: true,
+        opacity: 1.0,
+        side: THREE.DoubleSide
+      });
+      threeMesh = new THREE.Mesh(geo, mat);
+      threeScene.add(threeMesh);
+    }
+
+    function morph3DVertex(v, center, factor, radiusX, radiusY, sx, sy){
+      const dx = v.x - center.x;
+      const dy = v.y - center.y;
+      const nx = dx / Math.max(1e-6, radiusX);
+      const ny = dy / Math.max(1e-6, radiusY);
+      const r2 = nx*nx + ny*ny;
+      if(r2 > 1) return;
+      const w = (1 - r2) * factor;
+      v.x += dx * sx * w;
+      v.y += dy * sy * w;
+    }
+
+    function shift3DVertex(v, center, factor, radiusX, radiusY, dx, dy){
+      const rx = (v.x - center.x) / Math.max(1e-6, radiusX);
+      const ry = (v.y - center.y) / Math.max(1e-6, radiusY);
+      const r2 = rx*rx + ry*ry;
+      if(r2 > 1) return;
+      const w = (1 - r2) * factor;
+      v.x += dx * w;
+      v.y += dy * w;
+    }
+
+    function render3DFace(frameCanvas, lm, params){
+      if(!chk3D.checked || !lm){
+        if(glctx) glctx.clearRect(0,0,glC.width,glC.height);
+        return false;
+      }
+      ensureThree();
+      if(!threeInitialized) return false;
+      if(!threeMesh || !triIndices || !baseUV) buildFaceMesh(lm);
+      if(!threeMesh) return false;
+
+      const eyeScale = params.eyeScale;
+      const eyeSpaceV = params.eyeSpaceV;
+      const noseWV = params.noseWV;
+      const lipScale = params.lipScale;
+      const slimV = params.slimV;
+      const pwr = params.power;
+
+      const W = glC.width;
+      const H = glC.height;
+      const Pt = (i)=>({x: (lm[i].x - 0.5) * 2.0, y: -(lm[i].y - 0.5) * 2.0, z: -lm[i].z * 0.9});
+      const leftEyeC = avg(LEFT_EYE_IDX.map(Pt));
+      const rightEyeC = avg(RIGHT_EYE_IDX.map(Pt));
+      const noseC = avg(NOSE_IDX.map(Pt));
+      const lipC = avg(LIP_IDX.map(Pt));
+      const jawL = avg(JAW_LEFT_IDX.map(Pt));
+      const jawR = avg(JAW_RIGHT_IDX.map(Pt));
+
+      const posAttr = threeMesh.geometry.attributes.position;
+      const uvAttr = threeMesh.geometry.attributes.uv;
+      for(let i=0;i<lm.length;i++){
+        let v = Pt(i);
+
+        // mild localized deformation for realism
+        morph3DVertex(v, leftEyeC, eyeScale*0.55, 0.20, 0.13, 1.0, 0.75);
+        morph3DVertex(v, rightEyeC, eyeScale*0.55, 0.20, 0.13, 1.0, 0.75);
+        shift3DVertex(v, leftEyeC, Math.abs(eyeSpaceV)*0.9, 0.24, 0.15, -eyeSpaceV*0.32, 0);
+        shift3DVertex(v, rightEyeC, Math.abs(eyeSpaceV)*0.9, 0.24, 0.15, +eyeSpaceV*0.32, 0);
+        morph3DVertex(v, noseC, Math.abs(noseWV)*0.7, 0.18, 0.30, noseWV*0.65, 0.0);
+        morph3DVertex(v, lipC, lipScale*0.65, 0.26, 0.15, 0.9, 0.65);
+        shift3DVertex(v, jawL, slimV*0.55, 0.20, 0.20, slimV*0.11, 0);
+        shift3DVertex(v, jawR, slimV*0.55, 0.20, 0.20, -slimV*0.11, 0);
+
+        // pseudo-depth enhancement for 3D feel
+        const centerBias = Math.exp(-((v.x*v.x)/0.14 + (v.y*v.y)/0.35));
+        v.z -= centerBias * (0.025 + pwr*0.06);
+
+        posAttr.array[i*3] = v.x;
+        posAttr.array[i*3+1] = v.y;
+        posAttr.array[i*3+2] = v.z;
+        uvAttr.array[i*2] = lm[i].x;
+        uvAttr.array[i*2+1] = 1.0 - lm[i].y;
+      }
+      posAttr.needsUpdate = true;
+      uvAttr.needsUpdate = true;
+      threeMesh.geometry.computeVertexNormals();
+
+      if(threeTexture){
+        threeTexture.needsUpdate = true;
+      }
+      threeRenderer.render(threeScene, threeCamera);
+      return true;
     }
 
     function computeStyleScore(){
@@ -1167,6 +1349,7 @@
       $('lblMirror').textContent = text.lblMirror;
       $('lblLandmarks').textContent = text.lblLandmarks;
       $('lblHQ').textContent = text.lblHQ;
+      $('lbl3D').textContent = text.lbl3D || '3D Render';
       $('warnTitle').textContent = text.warnTitle;
       $('warnBody').textContent = text.warnBody;
       $('controlsTitle').textContent = text.controlsTitle;
@@ -1229,7 +1412,7 @@
 
     // ----- UI bindings -----
     const inputs = [
-      chkMirror, chkLandmarks, chkHQ,
+      chkMirror, chkLandmarks, chkHQ, chk3D,
       power, eye, eyeSpace, noseW, noseH, lip, slim,
       skin, contour, blush, liner, gloss,
       lipColor, hairStyle, hairColor,
@@ -1514,12 +1697,23 @@
       const eyeMid = avg([leftEyeC, rightEyeC]);
       const faceYaw = clamp((noseTip.x - eyeMid.x) / Math.max(1, (rightEyeC.x - leftEyeC.x)), -0.7, 0.7);
 
-      // 1) Landmark-guided local liquify (less identity break than region scaling)
-      applyLandmarkLiquify(actx, {
-        leftEyeC, rightEyeC, mouthC, noseTip,
-        leftCheek, rightCheek, leftJawMid, rightJawMid, chinTip,
-        eyeScale, eyeSpaceV, noseWV, lipScale, slimV, faceYaw, power: PWR
+      // 1) Geometry stage: real-time 3D mesh render (fallback: conservative 2D liquify)
+      const rendered3D = render3DFace(lastFrameCanvas, lm, {
+        eyeScale, eyeSpaceV, noseWV, lipScale, slimV, power: PWR
       });
+      if(rendered3D){
+        actx.save();
+        actx.globalCompositeOperation = "source-over";
+        actx.globalAlpha = 1;
+        actx.drawImage(glC, 0, 0, afterC.width, afterC.height);
+        actx.restore();
+      }else{
+        applyLandmarkLiquify(actx, {
+          leftEyeC, rightEyeC, mouthC, noseTip,
+          leftCheek, rightCheek, leftJawMid, rightJawMid, chinTip,
+          eyeScale, eyeSpaceV, noseWV, lipScale, slimV, faceYaw, power: PWR
+        });
+      }
 
       // 2) skin
       if(skinV > 0.001){
