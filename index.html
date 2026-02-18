@@ -478,10 +478,17 @@
             </div>
           </div>
 
-          <div class="control">
-            <div class="top"><div class="name">턱 Shape</div><div class="val" id="vJawShape">0</div></div>
-            <input type="range" id="jawShape" min="-50" max="50" value="0">
-            <div class="desc">음수는 부드러운 V라인, 양수는 각진 턱 라인으로 조절</div>
+          <div class="split">
+            <div class="control">
+              <div class="top"><div class="name">턱끝 길이</div><div class="val" id="vChinLength">0</div></div>
+              <input type="range" id="chinLength" min="-50" max="50" value="0">
+              <div class="desc">음수는 짧게, 양수는 길게 조절</div>
+            </div>
+            <div class="control">
+              <div class="top"><div class="name">하악각(각도)</div><div class="val" id="vJawAngle">0</div></div>
+              <input type="range" id="jawAngle" min="-50" max="50" value="0">
+              <div class="desc">음수는 부드럽게, 양수는 각지게 조절</div>
+            </div>
           </div>
 
           <div class="split makeup-control">
@@ -694,7 +701,7 @@
     const power = $('power');
     const eye = $('eye'), eyeSpace = $('eyeSpace');
     const noseW = $('noseW'), noseH = $('noseH');
-    const lip = $('lip'), slim = $('slim'), jawShape = $('jawShape');
+    const lip = $('lip'), slim = $('slim'), chinLength = $('chinLength'), jawAngle = $('jawAngle');
     const skin = $('skin'), contour = $('contour'), blush = $('blush'), liner = $('liner'), gloss = $('gloss');
     const lipColor = $('lipColor');
     const hairStyle = $('hairStyle');
@@ -706,7 +713,7 @@
     const vPower = $('vPower');
     const vEye = $('vEye'), vEyeSpace = $('vEyeSpace');
     const vNoseW = $('vNoseW'), vNoseH = $('vNoseH');
-    const vLip = $('vLip'), vSlim = $('vSlim'), vJawShape = $('vJawShape');
+    const vLip = $('vLip'), vSlim = $('vSlim'), vChinLength = $('vChinLength'), vJawAngle = $('vJawAngle');
     const vSkin = $('vSkin'), vContour = $('vContour'), vBlush = $('vBlush'), vLiner = $('vLiner'), vGloss = $('vGloss');
     const vLipColor = $('vLipColor'), vHairStyle = $('vHairStyle'), vHairColor = $('vHairColor'), vAcc = $('vAcc');
     const lookName = $('lookName');
@@ -1141,7 +1148,8 @@
       const noseWV = params.noseWV;
       const lipScale = params.lipScale;
       const slimV = params.slimV;
-      const jawShapeV = params.jawShapeV || 0;
+      const chinLengthV = params.chinLengthV || 0;
+      const jawAngleV = params.jawAngleV || 0;
       const pwr = params.power;
 
       const W = glC.width;
@@ -1168,9 +1176,11 @@
         morph3DVertex(v, lipC, lipScale*0.72, 0.26, 0.15, 0.95, 0.70);
         shift3DVertex(v, jawL, slimV*0.60, 0.20, 0.20, slimV*0.12, 0);
         shift3DVertex(v, jawR, slimV*0.60, 0.20, 0.20, -slimV*0.12, 0);
-        shift3DVertex(v, jawL, Math.abs(jawShapeV)*0.70, 0.24, 0.20, -jawShapeV*0.12, jawShapeV*0.03);
-        shift3DVertex(v, jawR, Math.abs(jawShapeV)*0.70, 0.24, 0.20, +jawShapeV*0.12, jawShapeV*0.03);
-        shift3DVertex(v, lipC, Math.abs(jawShapeV)*0.35, 0.26, 0.22, 0, -jawShapeV*0.03);
+        shift3DVertex(v, jawL, Math.abs(jawAngleV)*0.75, 0.24, 0.20, -jawAngleV*0.13, jawAngleV*0.03);
+        shift3DVertex(v, jawR, Math.abs(jawAngleV)*0.75, 0.24, 0.20, +jawAngleV*0.13, jawAngleV*0.03);
+        shift3DVertex(v, lipC, Math.abs(chinLengthV)*0.55, 0.28, 0.24, 0, chinLengthV*0.08);
+        shift3DVertex(v, jawL, Math.abs(chinLengthV)*0.45, 0.22, 0.22, 0, chinLengthV*0.06);
+        shift3DVertex(v, jawR, Math.abs(chinLengthV)*0.45, 0.22, 0.22, 0, chinLengthV*0.06);
 
         // pseudo-depth enhancement for 3D feel
         const centerBias = Math.exp(-((v.x*v.x)/0.14 + (v.y*v.y)/0.35));
@@ -1203,7 +1213,8 @@
         100 - Math.min(100, Math.abs(Number(noseH.value) - 52) * 1.4),
         100 - Math.min(100, Math.abs(Number(lip.value) - 18) * 1.9),
         100 - Math.min(100, Math.abs(Number(slim.value) - 34) * 1.4),
-        100 - Math.min(100, Math.abs(Number(jawShape.value) - 0) * 1.2),
+        100 - Math.min(100, Math.abs(Number(chinLength.value) - 0) * 1.2),
+        100 - Math.min(100, Math.abs(Number(jawAngle.value) - 0) * 1.2),
         100 - Math.min(100, Math.abs(Number(contour.value) - 33) * 1.5),
         100 - Math.min(100, Math.abs(Number(gloss.value) - 44) * 1.2)
       ];
@@ -1219,7 +1230,8 @@
       noseH.value = settings.noseH;
       lip.value = settings.lip;
       slim.value = settings.slim;
-      jawShape.value = settings.jawShape ?? 0;
+      chinLength.value = settings.chinLength ?? settings.jawShape ?? 0;
+      jawAngle.value = settings.jawAngle ?? settings.jawShape ?? 0;
       skin.value = settings.skin;
       contour.value = settings.contour;
       blush.value = settings.blush;
@@ -1257,7 +1269,8 @@
         score,
         settings: {
           power: Number(power.value), eye: Number(eye.value), eyeSpace: Number(eyeSpace.value),
-          noseW: Number(noseW.value), noseH: Number(noseH.value), lip: Number(lip.value), slim: Number(slim.value), jawShape: Number(jawShape.value),
+          noseW: Number(noseW.value), noseH: Number(noseH.value), lip: Number(lip.value), slim: Number(slim.value),
+          chinLength: Number(chinLength.value), jawAngle: Number(jawAngle.value),
           skin: Number(skin.value), contour: Number(contour.value), blush: Number(blush.value), liner: Number(liner.value), gloss: Number(gloss.value),
           hairStyle: hairStyle.value, hairColor: hairColor.value, lipColor: lipColor.value, glasses: glasses.checked, earrings: earrings.checked
         }
@@ -1427,7 +1440,7 @@
     // ----- UI bindings -----
     const inputs = [
       chkMirror, chkLandmarks, chkHQ, chk3D,
-      power, eye, eyeSpace, noseW, noseH, lip, slim, jawShape,
+      power, eye, eyeSpace, noseW, noseH, lip, slim, chinLength, jawAngle,
       skin, contour, blush, liner, gloss,
       lipColor, hairStyle, hairColor,
       glasses, earrings
@@ -1531,7 +1544,8 @@
       vNoseH.textContent = noseH.value;
       vLip.textContent = lip.value;
       vSlim.textContent = slim.value;
-      vJawShape.textContent = jawShape.value;
+      vChinLength.textContent = chinLength.value;
+      vJawAngle.textContent = jawAngle.value;
       vSkin.textContent = skin.value;
       vContour.textContent = contour.value;
       vBlush.textContent = blush.value;
@@ -1548,7 +1562,7 @@
         power.value = 36;
         eye.value = 8; eyeSpace.value = 2;
         noseW.value = -4; noseH.value = 24;
-        lip.value = 8; slim.value = 14; jawShape.value = -6;
+        lip.value = 8; slim.value = 14; chinLength.value = -8; jawAngle.value = -8;
         skin.value = 24; contour.value = 16; blush.value = 12; liner.value = 18; gloss.value = 20;
         hairStyle.value = "none";
         glasses.checked = false; earrings.checked = false;
@@ -1557,7 +1571,7 @@
         power.value = 56;
         eye.value = 15; eyeSpace.value = 4;
         noseW.value = -7; noseH.value = 38;
-        lip.value = 13; slim.value = 24; jawShape.value = 8;
+        lip.value = 13; slim.value = 24; chinLength.value = 6; jawAngle.value = 12;
         skin.value = 30; contour.value = 24; blush.value = 18; liner.value = 28; gloss.value = 30;
         hairStyle.value = "bob";
         glasses.checked = false; earrings.checked = true;
@@ -1566,7 +1580,7 @@
         power.value = 52;
         eye.value = 12; eyeSpace.value = 3;
         noseW.value = -6; noseH.value = 44;
-        lip.value = 12; slim.value = 20; jawShape.value = -2;
+        lip.value = 12; slim.value = 20; chinLength.value = -3; jawAngle.value = 4;
         skin.value = 36; contour.value = 18; blush.value = 16; liner.value = 22; gloss.value = 44;
         hairStyle.value = "long";
         glasses.checked = false; earrings.checked = true;
@@ -1705,7 +1719,8 @@
 
       const lipScale = (Number(lip.value)/100) * (0.18 + 0.34*PWR);
       const slimV = (Number(slim.value)/100) * (0.20 + 0.38*PWR);
-      const jawShapeV = (Number(jawShape.value)/100) * (0.28 + 0.42*PWR);
+      const chinLengthV = (Number(chinLength.value)/100) * (0.30 + 0.44*PWR);
+      const jawAngleV = (Number(jawAngle.value)/100) * (0.30 + 0.44*PWR);
 
       const contourV = (Number(slim.value)/100) * (0.20 + 0.34*PWR);
       const eyeMid = avg([leftEyeC, rightEyeC]);
@@ -1713,7 +1728,7 @@
 
       // 1) Geometry stage: real-time 3D mesh render (fallback: conservative 2D liquify)
       const rendered3D = render3DFace(lastFrameCanvas, lm, {
-        eyeScale, eyeSpaceV, noseWV, lipScale, slimV, jawShapeV, power: PWR
+        eyeScale, eyeSpaceV, noseWV, lipScale, slimV, chinLengthV, jawAngleV, power: PWR
       });
       if(rendered3D){
         actx.save();
@@ -1725,7 +1740,7 @@
         applyLandmarkLiquify(actx, {
           leftEyeC, rightEyeC, mouthC, noseTip,
           leftCheek, rightCheek, leftJawMid, rightJawMid, chinTip,
-          eyeScale, eyeSpaceV, noseWV, lipScale, slimV, jawShapeV, faceYaw, power: PWR
+          eyeScale, eyeSpaceV, noseWV, lipScale, slimV, chinLengthV, jawAngleV, faceYaw, power: PWR
         });
       }
 
@@ -1846,7 +1861,7 @@
       const {
         leftEyeC, rightEyeC, mouthC, noseTip,
         leftCheek, rightCheek, leftJawMid, rightJawMid, chinTip,
-        eyeScale, eyeSpaceV, noseWV, lipScale, slimV, jawShapeV=0, faceYaw=0, power=0.5
+        eyeScale, eyeSpaceV, noseWV, lipScale, slimV, chinLengthV=0, jawAngleV=0, faceYaw=0, power=0.5
       } = cfg;
 
       const base = 0.75 + power*0.20;
@@ -1877,9 +1892,13 @@
         softPinch(ctx, rightJawMid, 150, 180, slimV*0.12*rightWeight, -1, false);
         softPinch(ctx, chinTip, 190, 150, slimV*0.06*base, 0, false);
       }
-      if(Math.abs(jawShapeV) > 0.0005){
-        shiftRegion(ctx, leftJawMid, 130, 120, -jawShapeV*20);
-        shiftRegion(ctx, rightJawMid, 130, 120, +jawShapeV*20);
+      if(Math.abs(jawAngleV) > 0.0005){
+        shiftRegion(ctx, leftJawMid, 130, 120, -jawAngleV*22);
+        shiftRegion(ctx, rightJawMid, 130, 120, +jawAngleV*22);
+      }
+      if(Math.abs(chinLengthV) > 0.0005){
+        shiftRegion(ctx, chinTip, 150, 130, 0);
+        regionScale(ctx, chinTip, 170, 130, 1, 1 + chinLengthV*0.18);
       }
     }
 
