@@ -216,6 +216,100 @@
     .k{display:flex;gap:8px;flex-wrap:wrap}
     .ck{display:flex;align-items:center;gap:8px}
     .ck input{accent-color:#7aa7ff}
+    .stack{margin-top:14px;display:grid;gap:14px}
+    .contentCard{
+      border:1px solid var(--line);
+      border-radius: var(--r);
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      box-shadow: var(--shadow);
+      padding:14px;
+    }
+    .contentTitle{font-size:18px;font-weight:950;letter-spacing:-.02em}
+    .contentSub{margin-top:8px;color:var(--sub);font-size:13px;line-height:1.7}
+    .quickGrid{display:grid;gap:10px;grid-template-columns:repeat(3,minmax(0,1fr));margin-top:12px}
+    .quickItem{
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:16px;
+      background: rgba(255,255,255,.04);
+      padding:10px;
+      font-size:12px;
+      line-height:1.6;
+    }
+    .uxGrid{display:grid;gap:12px;grid-template-columns:1fr 1fr;margin-top:12px}
+    .lookDeck{
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:16px;
+      background: rgba(255,255,255,.04);
+      padding:12px;
+    }
+    .lookHead{display:flex;justify-content:space-between;gap:10px;align-items:center}
+    .lookName{font-weight:900;font-size:14px}
+    .scoreWrap{margin-top:8px}
+    .scoreTop{display:flex;justify-content:space-between;gap:8px;font-size:12px;color:var(--sub)}
+    .scoreBar{
+      margin-top:6px;
+      height:10px;
+      border-radius:999px;
+      background: rgba(255,255,255,.08);
+      overflow:hidden;
+    }
+    .scoreFill{
+      height:100%;
+      width:0%;
+      background: linear-gradient(90deg, rgba(255,211,110,.9), rgba(53,240,181,.9));
+      transition:width .25s ease;
+    }
+    .lookMeta{margin-top:8px;color:var(--sub);font-size:12px;line-height:1.6}
+    .savedList{display:grid;gap:8px;margin-top:10px}
+    .savedItem{
+      border:1px solid rgba(255,255,255,.1);
+      border-radius:12px;
+      padding:8px 10px;
+      background: rgba(0,0,0,.18);
+      display:flex;justify-content:space-between;gap:8px;align-items:center;
+      font-size:12px;
+    }
+    .savedItem button{
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.08);
+      color: var(--text);
+      border-radius:10px;
+      padding:6px 8px;
+      cursor:pointer;
+      font-size:11px;
+      font-weight:800;
+    }
+    .infoGrid{display:grid;gap:12px;grid-template-columns:1fr 1fr 1fr}
+    .faqItem{
+      border:1px solid rgba(255,255,255,.1);
+      border-radius:14px;
+      background: rgba(255,255,255,.03);
+      padding:10px;
+    }
+    .faqQ{font-weight:900;font-size:13px}
+    .faqA{color:var(--sub);font-size:12px;line-height:1.7;margin-top:6px}
+    .policyBar{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:12px;
+    }
+    .policyLink{
+      border:1px solid rgba(255,255,255,.14);
+      border-radius:999px;
+      padding:8px 12px;
+      font-size:12px;
+      color:var(--text);
+      text-decoration:none;
+      background: rgba(255,255,255,.04);
+    }
+    .policyLink:hover{background:rgba(255,255,255,.1)}
+    .footNote{
+      margin-top:10px;
+      color:var(--sub);
+      font-size:12px;
+      line-height:1.7;
+    }
     @media (max-width: 900px){
       .wrap{padding:12px 10px 20px;}
       .topbar{padding:12px; gap:10px;}
@@ -229,6 +323,9 @@
       .bd{padding:12px;}
       .pill{font-size:11px;}
       .control{padding:10px;}
+      .quickGrid{grid-template-columns:1fr;}
+      .uxGrid{grid-template-columns:1fr;}
+      .infoGrid{grid-template-columns:1fr;}
     }
     @media (max-width: 520px){
       .row .btn{flex:1 1 100%;}
@@ -244,9 +341,9 @@
       <div class="brand">
         <div class="logo" aria-hidden="true"></div>
         <div>
-          <h1><span id="appTitle">AI뷰티시뮬레이터</span> <span id="appSubtitle" style="color:var(--sub);font-weight:800;">— 더 티 나게 / Before-After 드래그</span></h1>
+          <h1><span id="appTitle">AI뷰티시뮬레이터</span> <span id="appSubtitle" style="color:var(--sub);font-weight:800;">— 자연스러운 Before-After 드래그</span></h1>
           <div class="sub" id="topSub">
-            ✅ 브라우저에서만 처리(서버 업로드 없음) · ✅ 헤어스타일 오버레이 + 컨투어/하이라이트 강화 · ✅ 참고용 시뮬레이션
+            ✅ 브라우저에서만 처리(서버 업로드 없음) · ✅ 자연스러운 AI 랜드마크 기반 보정 · ✅ 참고용 시뮬레이션
           </div>
         </div>
       </div>
@@ -328,8 +425,8 @@
       <aside class="card">
         <div class="hd">
           <div>
-            <div class="title" id="controlsTitle">🎛️ “더 티 나게” 컨트롤</div>
-            <div class="hint" id="controlsHint">이 버전은 일부러 체감이 크게 나도록(과감) 기본값/효과를 강화했습니다.</div>
+            <div class="title" id="controlsTitle">🎛️ 자연형 AI 뷰티 컨트롤</div>
+            <div class="hint" id="controlsHint">형체를 유지하면서 자연스럽게 변화를 주도록 강도를 재설계했습니다.</div>
           </div>
         </div>
 
@@ -450,6 +547,77 @@
         </div>
       </aside>
     </div>
+
+    <section class="stack">
+      <article class="contentCard">
+        <div class="contentTitle" id="growthTitle">AI뷰티시뮬레이터를 “도구”가 아니라 “콘텐츠형 서비스”로 운영하기</div>
+        <div class="contentSub" id="growthSub">AdSense 심사 관점에서 중요한 것은 광고 배치보다 페이지 가치입니다. 이 페이지는 체험+설명+가이드+신뢰 요소를 함께 제공하도록 설계되어 있습니다.</div>
+        <div class="quickGrid">
+          <div class="quickItem"><b id="kpi1Title">프로젝트화</b><br/><span id="kpi1Body">1회 체험이 아니라 저장/비교로 이어져 재방문을 만듭니다.</span></div>
+          <div class="quickItem"><b id="kpi2Title">추천 루프</b><br/><span id="kpi2Body">룩 카드 덱으로 “다음 추천”을 계속 탐색하게 만듭니다.</span></div>
+          <div class="quickItem"><b id="kpi3Title">신뢰 요소</b><br/><span id="kpi3Body">면책/FAQ/정책 링크를 명확히 제공해 품질 신호를 강화합니다.</span></div>
+        </div>
+      </article>
+
+      <article class="contentCard">
+        <div class="contentTitle" id="deckTitle">오늘의 AI 룩 카드 덱</div>
+        <div class="contentSub" id="deckSub">외모 평가가 아닌 스타일 균형 점수로 진행률을 보여주고, 저장한 룩을 다시 불러와 비교할 수 있습니다.</div>
+        <div class="uxGrid">
+          <div class="lookDeck">
+            <div class="lookHead">
+              <div class="lookName" id="lookName">추천 룩: 소프트 볼륨 데이</div>
+              <span class="badge" id="lookIndex">1 / 10</span>
+            </div>
+            <div class="lookMeta" id="lookMeta">헤어·립·윤곽 조합을 자동 추천합니다.</div>
+            <div class="scoreWrap">
+              <div class="scoreTop">
+                <span id="scoreLabel">스타일 균형 점수</span>
+                <span id="scoreValue">72%</span>
+              </div>
+              <div class="scoreBar"><div class="scoreFill" id="scoreFill"></div></div>
+            </div>
+            <div class="row" style="margin-top:10px;">
+              <button class="btn primary" id="btnApplyLook">룩 적용</button>
+              <button class="btn" id="btnNextLook">다음 추천</button>
+              <button class="btn gold" id="btnSaveLook">룩 저장</button>
+            </div>
+          </div>
+          <div class="lookDeck">
+            <div class="lookHead">
+              <div class="lookName" id="savedTitle">저장한 룩 비교</div>
+              <span class="badge" id="savedCount">0개</span>
+            </div>
+            <div class="lookMeta" id="savedSub">저장한 룩은 아래 목록에서 즉시 다시 적용할 수 있습니다.</div>
+            <div class="savedList" id="savedList"></div>
+          </div>
+        </div>
+      </article>
+
+      <article class="contentCard">
+        <div class="contentTitle" id="guideTitle">사용 가이드 & 신뢰 정보</div>
+        <div class="infoGrid" style="margin-top:12px;">
+          <div class="faqItem">
+            <div class="faqQ" id="faqQ1">시뮬레이터는 어떻게 작동하나요?</div>
+            <div class="faqA" id="faqA1">얼굴 랜드마크 기반 2D 워프와 색 보정을 조합해 전/후 변화를 시각화합니다.</div>
+          </div>
+          <div class="faqItem">
+            <div class="faqQ" id="faqQ2">왜 헤어/광택 옵션이 중요하나요?</div>
+            <div class="faqA" id="faqA2">헤어 실루엣과 하이라이트는 얼굴 인상을 크게 바꾸기 때문에 체감이 가장 큽니다.</div>
+          </div>
+          <div class="faqItem">
+            <div class="faqQ" id="faqQ3">의학적 결과를 보장하나요?</div>
+            <div class="faqA" id="faqA3">아니요. 본 서비스는 오락 및 스타일 참고용 시뮬레이션이며 실제 결과를 예측하지 않습니다.</div>
+          </div>
+        </div>
+        <div class="policyBar">
+          <a class="policyLink" href="#" id="lnkPrivacy">Privacy Policy</a>
+          <a class="policyLink" href="#" id="lnkAbout">About</a>
+          <a class="policyLink" href="#" id="lnkContact">Contact</a>
+          <a class="policyLink" href="#" id="lnkDisclaimer">Disclaimer</a>
+        </div>
+        <div class="footNote" id="footerNote">정책 페이지는 실제 운영 정보에 맞게 별도 문서로 연결하세요. (AdSense 심사 시 필수)</div>
+      </article>
+    </section>
   </div>
 
   <video id="video" playsinline style="display:none"></video>
@@ -525,6 +693,16 @@
     const vLip = $('vLip'), vSlim = $('vSlim');
     const vSkin = $('vSkin'), vContour = $('vContour'), vBlush = $('vBlush'), vLiner = $('vLiner'), vGloss = $('vGloss');
     const vLipColor = $('vLipColor'), vHairStyle = $('vHairStyle'), vHairColor = $('vHairColor'), vAcc = $('vAcc');
+    const lookName = $('lookName');
+    const lookIndex = $('lookIndex');
+    const lookMeta = $('lookMeta');
+    const scoreValue = $('scoreValue');
+    const scoreFill = $('scoreFill');
+    const btnApplyLook = $('btnApplyLook');
+    const btnNextLook = $('btnNextLook');
+    const btnSaveLook = $('btnSaveLook');
+    const savedList = $('savedList');
+    const savedCount = $('savedCount');
     const controlNameEls = Array.from(document.querySelectorAll('.control .name'));
     const controlDescEls = Array.from(document.querySelectorAll('.control .desc'));
 
@@ -536,15 +714,31 @@
     let lastFrameCanvas = null;
     let lastProcessAt = 0;
     let currentLang = 'ko';
+    let lookPointer = 0;
+    let currentLook = null;
+    const savedLooks = [];
+
+    const LOOK_TEMPLATES = [
+      { key: 'soft_volume_day', name: { ko: '소프트 볼륨 데이', en: 'Soft Volume Day' }, mood: { ko: '은은한 윤곽 + 광택 중심', en: 'Soft contour with gloss' }, settings: { power: 58, eye: 16, eyeSpace: 4, noseW: -8, noseH: 38, lip: 14, slim: 26, skin: 38, contour: 28, blush: 22, liner: 30, gloss: 44, hairStyle: 'bangs', hairColor: '#3b2519', lipColor: '#ff5f8f', glasses: false, earrings: true } },
+      { key: 'city_chic', name: { ko: '시티 시크', en: 'City Chic' }, mood: { ko: '라인 강조 + 보브', en: 'Sharper lines + bob hair' }, settings: { power: 72, eye: 24, eyeSpace: 7, noseW: -12, noseH: 54, lip: 18, slim: 40, skin: 32, contour: 40, blush: 24, liner: 55, gloss: 36, hairStyle: 'bob', hairColor: '#241712', lipColor: '#d9386a', glasses: true, earrings: true } },
+      { key: 'glow_event', name: { ko: '글로우 이벤트', en: 'Glow Event' }, mood: { ko: '하이라이트 + 롱헤어', en: 'High highlight + long hair' }, settings: { power: 76, eye: 20, eyeSpace: 5, noseW: -10, noseH: 70, lip: 22, slim: 34, skin: 52, contour: 30, blush: 28, liner: 34, gloss: 74, hairStyle: 'long', hairColor: '#2d1b14', lipColor: '#ff4e86', glasses: false, earrings: true } },
+      { key: 'clean_interview', name: { ko: '클린 인터뷰', en: 'Clean Interview' }, mood: { ko: '자연 톤 + 균형형', en: 'Natural tone + balanced fit' }, settings: { power: 52, eye: 12, eyeSpace: 3, noseW: -6, noseH: 34, lip: 10, slim: 24, skin: 34, contour: 22, blush: 18, liner: 24, gloss: 26, hairStyle: 'none', hairColor: '#2b1a14', lipColor: '#e76c98', glasses: true, earrings: false } },
+      { key: 'wedding_soft', name: { ko: '웨딩 소프트', en: 'Wedding Soft' }, mood: { ko: '맑은 피부 + 입술 포인트', en: 'Clear skin + lip focus' }, settings: { power: 66, eye: 18, eyeSpace: 4, noseW: -9, noseH: 50, lip: 20, slim: 30, skin: 50, contour: 26, blush: 30, liner: 30, gloss: 52, hairStyle: 'long', hairColor: '#3a2318', lipColor: '#ff6a9a', glasses: false, earrings: true } },
+      { key: 'editorial_dark', name: { ko: '에디토리얼 다크', en: 'Editorial Dark' }, mood: { ko: '강한 컨투어 + 선명한 눈매', en: 'Strong contour + defined eyes' }, settings: { power: 82, eye: 28, eyeSpace: 8, noseW: -14, noseH: 62, lip: 16, slim: 46, skin: 30, contour: 48, blush: 20, liner: 66, gloss: 32, hairStyle: 'bob', hairColor: '#161011', lipColor: '#be315f', glasses: true, earrings: true } },
+      { key: 'daily_glass', name: { ko: '데일리 글래스', en: 'Daily Glass' }, mood: { ko: '안경 중심의 데일리 룩', en: 'Glasses-first daily look' }, settings: { power: 48, eye: 10, eyeSpace: 3, noseW: -5, noseH: 28, lip: 9, slim: 20, skin: 30, contour: 20, blush: 16, liner: 22, gloss: 20, hairStyle: 'bangs', hairColor: '#352117', lipColor: '#e05f8f', glasses: true, earrings: false } },
+      { key: 'rose_party', name: { ko: '로즈 파티', en: 'Rose Party' }, mood: { ko: '블러셔/립 중심의 화사한 톤', en: 'Blush and lip focused vivid tone' }, settings: { power: 70, eye: 22, eyeSpace: 6, noseW: -11, noseH: 46, lip: 24, slim: 32, skin: 40, contour: 30, blush: 40, liner: 42, gloss: 62, hairStyle: 'long', hairColor: '#44261d', lipColor: '#ff4f88', glasses: false, earrings: true } },
+      { key: 'minimal_clean', name: { ko: '미니멀 클린', en: 'Minimal Clean' }, mood: { ko: '낮은 대비의 깔끔한 룩', en: 'Low-contrast clean style' }, settings: { power: 44, eye: 9, eyeSpace: 2, noseW: -4, noseH: 24, lip: 8, slim: 18, skin: 28, contour: 16, blush: 12, liner: 18, gloss: 18, hairStyle: 'none', hairColor: '#2a1b15', lipColor: '#d96f97', glasses: false, earrings: false } },
+      { key: 'screen_ready', name: { ko: '스크린 레디', en: 'Screen Ready' }, mood: { ko: '카메라 친화형 대비 강화', en: 'Camera-friendly contrast boost' }, settings: { power: 78, eye: 26, eyeSpace: 7, noseW: -12, noseH: 58, lip: 20, slim: 38, skin: 42, contour: 42, blush: 30, liner: 60, gloss: 46, hairStyle: 'bob', hairColor: '#261814', lipColor: '#ee3f7a', glasses: false, earrings: true } }
+    ];
 
     const I18N = {
       ko: {
         htmlLang: 'ko',
-        docTitle: 'AI뷰티시뮬레이터 — 더 티 나게 (Before/After 슬라이더)',
+        docTitle: 'AI뷰티시뮬레이터 — 자연형 Before/After 슬라이더',
         docDesc: '내 사진으로 눈/코/입/윤곽 워프 + 컨투어/하이라이트/아이라인/립/블러셔 + 헤어스타일 오버레이까지.',
         appTitle: 'AI뷰티시뮬레이터',
-        appSubtitle: '— 더 티 나게 / Before-After 드래그',
-        topSub: '✅ 브라우저에서만 처리(서버 업로드 없음) · ✅ 헤어스타일 오버레이 + 컨투어/하이라이트 강화 · ✅ 참고용 시뮬레이션',
+        appSubtitle: '— 자연스러운 Before-After 드래그',
+        topSub: '✅ 브라우저에서만 처리(서버 업로드 없음) · ✅ 자연스러운 AI 랜드마크 기반 보정 · ✅ 참고용 시뮬레이션',
         langLabel: '언어',
         btnCamera: '카메라 사용',
         btnUpload: '사진 업로드',
@@ -552,8 +746,8 @@
         btnReset: '초기화',
         previewTitle: '🪞 미리보기',
         pillCompare: '슬라이더 드래그로 Before/After 비교',
-        pillDepth: '윤곽 핀치 + 광(하이라이트)로 “2.5D 착시”',
-        pillHair: '헤어(앞머리/단발/장발) 오버레이',
+        pillDepth: '윤곽/광택을 과하지 않게 보정해 자연스러운 변화를 유지',
+        pillHair: '헤어(앞머리/단발/장발) 오버레이(낮은 강도)',
         presetNatural: '프리셋: 자연',
         presetDramatic: '프리셋: 드라마틱',
         presetGlow: '프리셋: 광택',
@@ -566,8 +760,8 @@
         lblHQ: '고화질',
         warnTitle: '면책',
         warnBody: '본 서비스는 오락 및 스타일 참고용 시뮬레이션입니다. 실제 시술/수술 결과를 예측하지 않습니다.',
-        controlsTitle: '🎛️ “더 티 나게” 컨트롤',
-        controlsHint: '이 버전은 일부러 체감이 크게 나도록(과감) 기본값/효과를 강화했습니다.',
+        controlsTitle: '🎛️ 자연형 AI 뷰티 컨트롤',
+        controlsHint: '형체를 유지하면서 자연스럽게 변화를 주도록 강도를 재설계했습니다.',
         controlNames: ['전체 강도', '눈 크기', '눈 간격', '코 폭', '코 ‘높아보임’', '입술 볼륨', '턱/윤곽', '피부 보정', '컨투어(쉐딩)', '블러셔', '아이라인', '립 컬러', '립 글로스', '헤어 스타일', '헤어 컬러', '악세서리'],
         controlDescs: ['모든 변형/메이크업/윤곽 효과의 “마스터 게인”', '눈 확대/축소', '눈을 안/밖으로 이동', '콧볼 느낌(가로 워프)', '콧대 하이라이트 + 양옆 쉐딩 강화', '입술 확대/축소', '볼/턱 라인을 중앙으로 핀치(체감 큼)', '얼굴 영역 스무딩 + 톤', '광대/턱/코 옆 쉐딩', '치크 컬러', '윗라인/눈꼬리 강조', '입술 색상', '입술 광(2.5D 체감↑)', '정밀 세그멘테이션 대신 “얼굴 외곽/이마 포인트” 기반으로 그럴듯한 오버레이를 만듭니다(티 많이 남).', '헤어 오버레이 색', '눈/턱 위치 기반 오버레이'],
         hairOptions: ['없음', '앞머리', '단발(보브)', '장발'],
@@ -796,6 +990,117 @@
       return I18N[currentLang] || I18N.ko;
     }
 
+    function i18nPick(obj){
+      if(!obj) return '';
+      return obj[currentLang] || obj.en || obj.ko || '';
+    }
+
+    function clamp(v, min, max){
+      return Math.max(min, Math.min(max, v));
+    }
+
+    function computeStyleScore(){
+      // Style balance score: controls harmony, not attractiveness.
+      const scoreParts = [
+        100 - Math.min(100, Math.abs(Number(power.value) - 68) * 1.7),
+        100 - Math.min(100, Math.abs(Number(eye.value) - 20) * 1.6),
+        100 - Math.min(100, Math.abs(Number(eyeSpace.value) - 5) * 3.2),
+        100 - Math.min(100, Math.abs(Number(noseW.value) + 10) * 2.0),
+        100 - Math.min(100, Math.abs(Number(noseH.value) - 52) * 1.4),
+        100 - Math.min(100, Math.abs(Number(lip.value) - 18) * 1.9),
+        100 - Math.min(100, Math.abs(Number(slim.value) - 34) * 1.4),
+        100 - Math.min(100, Math.abs(Number(contour.value) - 33) * 1.5),
+        100 - Math.min(100, Math.abs(Number(gloss.value) - 44) * 1.2)
+      ];
+      const avgScore = scoreParts.reduce((a,b)=>a+b,0) / scoreParts.length;
+      return Math.round(clamp(avgScore, 0, 100));
+    }
+
+    function applyLookSettings(settings){
+      power.value = settings.power;
+      eye.value = settings.eye;
+      eyeSpace.value = settings.eyeSpace;
+      noseW.value = settings.noseW;
+      noseH.value = settings.noseH;
+      lip.value = settings.lip;
+      slim.value = settings.slim;
+      skin.value = settings.skin;
+      contour.value = settings.contour;
+      blush.value = settings.blush;
+      liner.value = settings.liner;
+      gloss.value = settings.gloss;
+      hairStyle.value = settings.hairStyle;
+      hairColor.value = settings.hairColor;
+      lipColor.value = settings.lipColor;
+      glasses.checked = settings.glasses;
+      earrings.checked = settings.earrings;
+      setValLabels();
+      renderAll();
+      updateScoreUI();
+    }
+
+    function updateDeckUI(){
+      if(!currentLook) return;
+      lookName.textContent = `${tr().deckRecommendLabel || '추천 룩'}: ${i18nPick(currentLook.name)}`;
+      lookMeta.textContent = i18nPick(currentLook.mood);
+      lookIndex.textContent = `${lookPointer + 1} / ${LOOK_TEMPLATES.length}`;
+    }
+
+    function nextLook(){
+      lookPointer = (lookPointer + 1) % LOOK_TEMPLATES.length;
+      currentLook = LOOK_TEMPLATES[lookPointer];
+      updateDeckUI();
+    }
+
+    function saveCurrentLook(){
+      if(!currentLook) return;
+      const score = computeStyleScore();
+      const snapshot = {
+        id: `${currentLook.key}-${Date.now()}`,
+        name: i18nPick(currentLook.name),
+        score,
+        settings: {
+          power: Number(power.value), eye: Number(eye.value), eyeSpace: Number(eyeSpace.value),
+          noseW: Number(noseW.value), noseH: Number(noseH.value), lip: Number(lip.value), slim: Number(slim.value),
+          skin: Number(skin.value), contour: Number(contour.value), blush: Number(blush.value), liner: Number(liner.value), gloss: Number(gloss.value),
+          hairStyle: hairStyle.value, hairColor: hairColor.value, lipColor: lipColor.value, glasses: glasses.checked, earrings: earrings.checked
+        }
+      };
+      savedLooks.unshift(snapshot);
+      if(savedLooks.length > 8) savedLooks.pop();
+      renderSavedLooks();
+    }
+
+    function renderSavedLooks(){
+      savedList.innerHTML = '';
+      savedCount.textContent = `${savedLooks.length}${tr().savedCountSuffix || '개'}`;
+      if(savedLooks.length === 0){
+        const empty = document.createElement('div');
+        empty.className = 'savedItem';
+        empty.textContent = tr().savedEmpty || '저장된 룩이 없습니다.';
+        savedList.appendChild(empty);
+        return;
+      }
+      for(const item of savedLooks){
+        const row = document.createElement('div');
+        row.className = 'savedItem';
+        const title = document.createElement('span');
+        title.textContent = `${item.name} · ${item.score}%`;
+        const btn = document.createElement('button');
+        btn.textContent = tr().applySavedBtn || '다시 적용';
+        btn.addEventListener('click', ()=> applyLookSettings(item.settings));
+        row.appendChild(title);
+        row.appendChild(btn);
+        savedList.appendChild(row);
+      }
+    }
+
+    function updateScoreUI(){
+      const score = computeStyleScore();
+      scoreValue.textContent = `${score}%`;
+      scoreFill.style.width = `${score}%`;
+    }
+
     // FaceMesh init
     const faceMesh = new FaceMesh({
       locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`
@@ -931,21 +1236,35 @@
       glasses, earrings
     ];
     inputs.forEach(el=>{
-      el.addEventListener('input', ()=>{ setValLabels(); renderAll(); });
-      el.addEventListener('change', ()=>{ setValLabels(); renderAll(); });
+      el.addEventListener('input', ()=>{ setValLabels(); renderAll(); updateScoreUI(); });
+      el.addEventListener('change', ()=>{ setValLabels(); renderAll(); updateScoreUI(); });
     });
 
     btnPresetNatural.addEventListener('click', ()=>{
       applyPreset('natural');
       renderAll();
+      updateScoreUI();
     });
     btnPresetDramatic.addEventListener('click', ()=>{
       applyPreset('dramatic');
       renderAll();
+      updateScoreUI();
     });
     btnPresetGlow.addEventListener('click', ()=>{
       applyPreset('glow');
       renderAll();
+      updateScoreUI();
+    });
+
+    btnApplyLook.addEventListener('click', ()=>{
+      if(!currentLook) return;
+      applyLookSettings(currentLook.settings);
+    });
+    btnNextLook.addEventListener('click', ()=>{
+      nextLook();
+    });
+    btnSaveLook.addEventListener('click', ()=>{
+      saveCurrentLook();
     });
 
     btnUseCamera.addEventListener('click', async ()=>{
@@ -982,7 +1301,7 @@
     });
 
     btnReset.addEventListener('click', async ()=>{
-      applyPreset('dramatic'); // keep fun default
+      applyPreset('natural');
       lastLandmarks = null;
       lastFrameCanvas = null;
 
@@ -995,6 +1314,7 @@
       vctx.fillRect(0,0,view.width,view.height);
       drawHint(vctx, tr().hintUpload);
       setActions(false);
+      updateScoreUI();
     });
 
     function setActions(on){
@@ -1025,31 +1345,30 @@
     }
 
     function applyPreset(name){
-      // you asked “더 티 나게”, so defaults are already strong.
       if(name === 'natural'){
-        power.value = 45;
-        eye.value = 12; eyeSpace.value = 4;
-        noseW.value = -8; noseH.value = 28;
-        lip.value = 10; slim.value = 22;
-        skin.value = 28; contour.value = 22; blush.value = 18; liner.value = 28; gloss.value = 22;
-        hairStyle.value = "bangs";
-        glasses.checked = false; earrings.checked = true;
+        power.value = 36;
+        eye.value = 8; eyeSpace.value = 2;
+        noseW.value = -4; noseH.value = 24;
+        lip.value = 8; slim.value = 14;
+        skin.value = 24; contour.value = 16; blush.value = 12; liner.value = 18; gloss.value = 20;
+        hairStyle.value = "none";
+        glasses.checked = false; earrings.checked = false;
       }
       if(name === 'dramatic'){
-        power.value = 75;
-        eye.value = 30; eyeSpace.value = 8;
-        noseW.value = -14; noseH.value = 55;
-        lip.value = 22; slim.value = 45;
-        skin.value = 38; contour.value = 40; blush.value = 32; liner.value = 55; gloss.value = 40;
+        power.value = 56;
+        eye.value = 15; eyeSpace.value = 4;
+        noseW.value = -7; noseH.value = 38;
+        lip.value = 13; slim.value = 24;
+        skin.value = 30; contour.value = 24; blush.value = 18; liner.value = 28; gloss.value = 30;
         hairStyle.value = "bob";
-        glasses.checked = true; earrings.checked = true;
+        glasses.checked = false; earrings.checked = true;
       }
       if(name === 'glow'){
-        power.value = 70;
-        eye.value = 22; eyeSpace.value = 6;
-        noseW.value = -12; noseH.value = 65;
-        lip.value = 18; slim.value = 35;
-        skin.value = 50; contour.value = 28; blush.value = 26; liner.value = 38; gloss.value = 70;
+        power.value = 52;
+        eye.value = 12; eyeSpace.value = 3;
+        noseW.value = -6; noseH.value = 44;
+        lip.value = 12; slim.value = 20;
+        skin.value = 36; contour.value = 18; blush.value = 16; liner.value = 22; gloss.value = 44;
         hairStyle.value = "long";
         glasses.checked = false; earrings.checked = true;
       }
@@ -1062,8 +1381,12 @@
     applyLanguage(initialLang);
 
     // initial preset
-    applyPreset('dramatic');
+    applyPreset('natural');
     setActions(false);
+    currentLook = LOOK_TEMPLATES[lookPointer];
+    updateDeckUI();
+    renderSavedLooks();
+    updateScoreUI();
 
     // placeholder
     vctx.fillStyle = "rgb(9,12,26)";
@@ -1183,20 +1506,20 @@
       const faceOval = faceOvalIdx.map(Pt);
 
       // parameters (scaled by power)
-      const eyeScale = (Number(eye.value)/100) * (0.55 + 0.75*PWR);
-      const eyeSpaceV= (Number(eyeSpace.value)/100) * (0.55 + 0.75*PWR);
+      const eyeScale = (Number(eye.value)/100) * (0.18 + 0.32*PWR);
+      const eyeSpaceV= (Number(eyeSpace.value)/100) * (0.14 + 0.24*PWR);
 
-      const noseWV = (Number(noseW.value)/100) * (0.55 + 0.85*PWR);
-      const noseHV = (Number(noseH.value)/100) * (0.45 + 0.85*PWR);
+      const noseWV = (Number(noseW.value)/100) * (0.16 + 0.28*PWR);
+      const noseHV = (Number(noseH.value)/100) * (0.20 + 0.40*PWR);
 
-      const lipScale = (Number(lip.value)/100) * (0.55 + 0.80*PWR);
-      const slimV = (Number(slim.value)/100) * (0.55 + 0.85*PWR);
+      const lipScale = (Number(lip.value)/100) * (0.16 + 0.30*PWR);
+      const slimV = (Number(slim.value)/100) * (0.18 + 0.34*PWR);
 
-      const skinV = (Number(skin.value)/100) * (0.55 + 0.85*PWR);
-      const contourV = (Number(contour.value)/100) * (0.55 + 0.85*PWR);
-      const blushV = (Number(blush.value)/100) * (0.55 + 0.85*PWR);
-      const linerV = (Number(liner.value)/100) * (0.55 + 0.85*PWR);
-      const glossV = (Number(gloss.value)/100) * (0.55 + 0.85*PWR);
+      const skinV = (Number(skin.value)/100) * (0.26 + 0.44*PWR);
+      const contourV = (Number(contour.value)/100) * (0.24 + 0.40*PWR);
+      const blushV = (Number(blush.value)/100) * (0.22 + 0.38*PWR);
+      const linerV = (Number(liner.value)/100) * (0.24 + 0.40*PWR);
+      const glossV = (Number(gloss.value)/100) * (0.24 + 0.42*PWR);
 
       // 1) skin (stronger)
       if(skinV > 0.001){
@@ -1205,32 +1528,31 @@
 
       // 2) Slim pinch (the most “티 남”)
       if(slimV > 0.001){
-        softPinch(actx, leftCheek,   360, 520, slimV*0.55, +1, HQ);
-        softPinch(actx, rightCheek,  360, 520, slimV*0.55, -1, HQ);
-        softPinch(actx, leftJawMid,  330, 480, slimV*0.65, +1, HQ);
-        softPinch(actx, rightJawMid, 330, 480, slimV*0.65, -1, HQ);
-        // extra “V-line” feel near chin
-        softPinch(actx, chinTip, 420, 440, slimV*0.30, 0, HQ); // 0 => symmetrical inward
+        softPinch(actx, leftCheek,   280, 390, slimV*0.22, +1, HQ);
+        softPinch(actx, rightCheek,  280, 390, slimV*0.22, -1, HQ);
+        softPinch(actx, leftJawMid,  250, 340, slimV*0.25, +1, HQ);
+        softPinch(actx, rightJawMid, 250, 340, slimV*0.25, -1, HQ);
+        softPinch(actx, chinTip, 300, 260, slimV*0.12, 0, HQ);
       }
 
       // 3) eyes (spacing + scaling)
       if(Math.abs(eyeSpaceV) > 0.001){
-        shiftRegion(actx, leftEyeC,  280, 200, -eyeSpaceV*100);
-        shiftRegion(actx, rightEyeC, 280, 200, +eyeSpaceV*100);
+        shiftRegion(actx, leftEyeC,  210, 150, -eyeSpaceV*42);
+        shiftRegion(actx, rightEyeC, 210, 150, +eyeSpaceV*42);
       }
       if(Math.abs(eyeScale) > 0.001){
-        regionScale(actx, leftEyeC,  280, 200, 1 + eyeScale, 1 + eyeScale*0.85);
-        regionScale(actx, rightEyeC, 280, 200, 1 + eyeScale, 1 + eyeScale*0.85);
+        regionScale(actx, leftEyeC,  210, 150, 1 + eyeScale, 1 + eyeScale*0.62);
+        regionScale(actx, rightEyeC, 210, 150, 1 + eyeScale, 1 + eyeScale*0.62);
       }
 
       // 4) nose width (narrow/widen)
       if(Math.abs(noseWV) > 0.001){
-        regionScale(actx, noseTip,  360, 520, 1 + noseWV, 1);
+        regionScale(actx, noseTip,  220, 280, 1 + noseWV, 1);
       }
 
       // 5) lips
       if(Math.abs(lipScale) > 0.001){
-        regionScale(actx, mouthC, 560, 360, 1 + lipScale, 1 + lipScale*0.70);
+        regionScale(actx, mouthC, 310, 190, 1 + lipScale, 1 + lipScale*0.45);
       }
 
       // 6) Contour + highlight (make it “3D-ish”)
@@ -1253,11 +1575,11 @@
       }
 
       // 9) lips color + gloss
-      applyLips(actx, lm, lipColor.value, 0.18 + 0.62*Math.max(0, lipScale+0.15), glossV, HQ);
+      applyLips(actx, lm, lipColor.value, 0.10 + 0.36*Math.max(0, lipScale+0.10), glossV, HQ);
 
-      // 10) hair overlay (THIS makes it super obvious)
+      // 10) hair overlay
       if(hairStyle.value !== 'none'){
-        drawHairOverlay(actx, lm, hairStyle.value, hairColor.value, HQ);
+        drawHairOverlay(actx, lm, hairStyle.value, hairColor.value, HQ, PWR);
       }
 
       // 11) accessories
@@ -1404,9 +1726,9 @@
       tmp.width = tw; tmp.height = th;
       tmp.getContext('2d').drawImage(ctx.canvas, x, y, tw, th, 0, 0, tw, th);
 
-      const slices = HQ ? 38 : 28;
+      const slices = HQ ? 34 : 24;
       const sliceW = Math.max(2, Math.floor(tw / slices));
-      const maxShift = strength * 0.22 * tw;
+      const maxShift = strength * 0.14 * tw;
 
       ctx.save();
       ctx.beginPath();
@@ -1436,8 +1758,8 @@
     }
 
     function applySkin(ctx, facePoly, amount, HQ){
-      const passes = HQ ? Math.round(3 + amount*7) : Math.round(2 + amount*4);
-      const alpha = HQ ? (0.05 + amount*0.11) : (0.045 + amount*0.08);
+      const passes = HQ ? Math.round(2 + amount*5) : Math.round(2 + amount*3);
+      const alpha = HQ ? (0.03 + amount*0.08) : (0.028 + amount*0.06);
 
       ctx.save();
       polygonClip(ctx, facePoly);
@@ -1454,11 +1776,11 @@
       }
 
       // tone lift + tiny highlight
-      ctx.globalAlpha = 0.06 + amount*0.16;
+      ctx.globalAlpha = 0.04 + amount*0.10;
       ctx.fillStyle = "rgba(255,235,240,0.35)";
       ctx.fillRect(0,0,ctx.canvas.width, ctx.canvas.height);
 
-      ctx.globalAlpha = 0.05 + amount*0.10;
+      ctx.globalAlpha = 0.03 + amount*0.06;
       ctx.fillStyle = "rgba(255,255,255,0.20)";
       ctx.fillRect(0,0,ctx.canvas.width, ctx.canvas.height);
 
@@ -1482,9 +1804,9 @@
       ctx.save();
       polygonClip(ctx, faceOval);
 
-      // contour (stronger)
+      // contour
       if(contourV > 0.001){
-        const a = contourV * (HQ ? 0.30 : 0.22);
+        const a = contourV * (HQ ? 0.16 : 0.12);
         ctx.globalAlpha = a;
 
         radialGlow(ctx, leftCheek.x - 160, leftCheek.y + 140, HQ ? 320 : 260, "rgba(35,15,20,0.55)");
@@ -1499,7 +1821,7 @@
 
       // nose height (highlight + side shading)
       if(noseHV > 0.001){
-        const a = noseHV * (HQ ? 0.50 : 0.36);
+        const a = noseHV * (HQ ? 0.22 : 0.16);
         ctx.globalAlpha = a;
 
         const g = ctx.createLinearGradient(noseBridge.x, noseBridge.y - 140, noseTip.x, noseTip.y + 160);
@@ -1523,7 +1845,7 @@
       }
 
       // cheekbone highlight (2.5D pop)
-      ctx.globalAlpha = (HQ ? 0.10 : 0.08) * (0.6 + contourV);
+      ctx.globalAlpha = (HQ ? 0.06 : 0.045) * (0.6 + contourV);
       radialGlow(ctx, leftCheek.x - 20, leftCheek.y - 10, HQ ? 230 : 190, "rgba(255,255,255,0.20)");
       radialGlow(ctx, rightCheek.x + 20, rightCheek.y - 10, HQ ? 230 : 190, "rgba(255,255,255,0.20)");
       ctx.globalAlpha = 1;
@@ -1532,7 +1854,7 @@
     }
 
     function applyBlush(ctx, leftCheek, rightCheek, amount, HQ){
-      const a = amount * (HQ ? 0.38 : 0.28);
+      const a = amount * (HQ ? 0.20 : 0.16);
       ctx.save();
       ctx.globalAlpha = a;
       radialGlow(ctx, leftCheek.x - 18, leftCheek.y + 30, HQ ? 190 : 160, "rgba(255,80,120,0.55)");
@@ -1550,7 +1872,7 @@
       const rightUpper = [362, 385, 387, 386, 384, 263];
 
       ctx.save();
-      ctx.globalAlpha = 0.12 + a*0.65;
+      ctx.globalAlpha = 0.08 + a*0.36;
       ctx.strokeStyle = "rgba(8,8,12,0.95)";
       ctx.lineWidth = 2.2 + a*3.2;
       ctx.lineCap = "round";
@@ -1560,7 +1882,7 @@
       strokePath(rightUpper.map(P));
 
       // wing
-      ctx.globalAlpha = 0.10 + a*0.60;
+      ctx.globalAlpha = 0.06 + a*0.30;
       wing(P(33), P(133), +1);
       wing(P(362), P(263), -1);
 
@@ -1641,7 +1963,7 @@
     }
 
     // ----- Hair overlay (big visual change) -----
-    function drawHairOverlay(ctx, lm, style, colorHex, HQ){
+    function drawHairOverlay(ctx, lm, style, colorHex, HQ, power=0.5){
       const W = ctx.canvas.width, H = ctx.canvas.height;
       const P = (i)=>({x: lm[i].x*W, y: lm[i].y*H});
 
@@ -1666,7 +1988,7 @@
       ctx.save();
 
       // shadow behind hair for depth
-      ctx.globalAlpha = HQ ? 0.25 : 0.20;
+      ctx.globalAlpha = HQ ? 0.12 : 0.10;
       ctx.filter = `blur(${HQ ? 6 : 4}px)`;
       ctx.fillStyle = "rgba(0,0,0,0.55)";
       ctx.beginPath();
@@ -1676,12 +1998,12 @@
 
       // hair base gradient
       const base = ctx.createLinearGradient(0, headTopY, 0, faceBox.yMax + faceBox.h*0.35);
-      base.addColorStop(0, hexToRgba(colorHex, 0.95));
-      base.addColorStop(0.6, hexToRgba(colorHex, 0.88));
-      base.addColorStop(1, "rgba(0,0,0,0.55)");
+      base.addColorStop(0, hexToRgba(colorHex, 0.78));
+      base.addColorStop(0.6, hexToRgba(colorHex, 0.64));
+      base.addColorStop(1, "rgba(0,0,0,0.35)");
 
       // hair shape depending on style
-      ctx.globalAlpha = 0.98;
+      ctx.globalAlpha = 0.34 + power*0.28;
       ctx.fillStyle = base;
 
       if(style === 'bangs'){
@@ -1701,7 +2023,7 @@
       }
 
       // hair shine (adds 3D feel)
-      ctx.globalAlpha = HQ ? 0.18 : 0.14;
+      ctx.globalAlpha = HQ ? 0.10 : 0.08;
       ctx.filter = `blur(${HQ ? 8 : 6}px)`;
       const shine = ctx.createLinearGradient(faceBox.cx - headW*0.25, headTopY, faceBox.cx + headW*0.15, headTopY + faceBox.h);
       shine.addColorStop(0, "rgba(255,255,255,0.00)");
@@ -1715,7 +2037,7 @@
 
       // clip hair so it doesn’t paint over face too much: subtract face area a little (soft)
       ctx.globalCompositeOperation = "destination-out";
-      ctx.globalAlpha = 0.25;
+      ctx.globalAlpha = 0.34;
       ctx.filter = `blur(${HQ ? 10 : 7}px)`;
       polygonFill(ctx, face);
       ctx.filter = "none";
