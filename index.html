@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>AI뷰티시뮬레이터 — 더 티 나게 (Before/After 슬라이더)</title>
-  <meta name="description" content="내 사진으로 눈/코/입/윤곽 워프 + 컨투어/하이라이트/아이라인/립/블러셔 + 헤어스타일(앞머리/단발/장발) 오버레이까지. Before/After 드래그 슬라이더로 확 체감." />
+  <meta name="description" content="내 얼굴 랜드마크 기반 3D 성형 시뮬레이션. 눈/코/입/윤곽 구조 변화와 Before/After 드래그 비교를 제공합니다." />
   <style>
     :root{
       --bg:#070A14;
@@ -216,6 +216,7 @@
     .k{display:flex;gap:8px;flex-wrap:wrap}
     .ck{display:flex;align-items:center;gap:8px}
     .ck input{accent-color:#7aa7ff}
+    .makeup-control{display:none !important;}
     .stack{margin-top:14px;display:grid;gap:14px}
     .contentCard{
       border:1px solid var(--line);
@@ -405,7 +406,7 @@
             <div class="toggle">
               <div class="tiny">
                 <span class="badge" id="tipBadge">팁</span>
-                <span id="tipText">“강도”를 60~80으로 올리면 훨씬 <b>티</b>가 나고, “헤어 스타일”을 바꾸면 체감이 확 커져요.</span>
+                <span id="tipText">눈/코/입/윤곽을 낮은 강도부터 조정하면 실제 수술 후 인상을 더 현실적으로 비교할 수 있습니다.</span>
               </div>
               <div class="k">
                 <label class="ck tiny"><input type="checkbox" id="chkMirror" checked> <span id="lblMirror">거울</span></label>
@@ -426,8 +427,8 @@
       <aside class="card">
         <div class="hd">
           <div>
-            <div class="title" id="controlsTitle">🎛️ 자연형 AI 뷰티 컨트롤</div>
-            <div class="hint" id="controlsHint">형체를 유지하면서 자연스럽게 변화를 주도록 강도를 재설계했습니다.</div>
+            <div class="title" id="controlsTitle">🎛️ 3D 성형 시뮬레이션 컨트롤</div>
+            <div class="hint" id="controlsHint">메이크업 효과 없이 얼굴 구조 변화만 반영해 수술 후 인상을 현실적으로 가늠합니다.</div>
           </div>
         </div>
 
@@ -477,7 +478,7 @@
             </div>
           </div>
 
-          <div class="split">
+          <div class="split makeup-control">
             <div class="control">
               <div class="top"><div class="name">피부 보정</div><div class="val" id="vSkin">35</div></div>
               <input type="range" id="skin" min="0" max="100" value="35">
@@ -490,7 +491,7 @@
             </div>
           </div>
 
-          <div class="split">
+          <div class="split makeup-control">
             <div class="control">
               <div class="top"><div class="name">블러셔</div><div class="val" id="vBlush">30</div></div>
               <input type="range" id="blush" min="0" max="100" value="30">
@@ -503,7 +504,7 @@
             </div>
           </div>
 
-          <div class="split">
+          <div class="split makeup-control">
             <div class="control">
               <div class="top"><div class="name">립 컬러</div><div class="val" id="vLipColor">#ff3e7a</div></div>
               <input type="color" id="lipColor" value="#ff3e7a">
@@ -516,7 +517,7 @@
             </div>
           </div>
 
-          <div class="control">
+          <div class="control makeup-control">
             <div class="top"><div class="name">헤어 스타일</div><div class="val" id="vHairStyle">앞머리</div></div>
             <select id="hairStyle">
               <option value="none">없음</option>
@@ -527,7 +528,7 @@
             <div class="desc">정밀 세그멘테이션 대신 “얼굴 외곽/이마 포인트” 기반으로 그럴듯한 오버레이를 만듭니다(티 많이 남).</div>
           </div>
 
-          <div class="split">
+          <div class="split makeup-control">
             <div class="control">
               <div class="top"><div class="name">헤어 컬러</div><div class="val" id="vHairColor">#2b1a14</div></div>
               <input type="color" id="hairColor" value="#2b1a14">
@@ -744,7 +745,7 @@
       ko: {
         htmlLang: 'ko',
         docTitle: 'AI뷰티시뮬레이터 — 자연형 Before/After 슬라이더',
-        docDesc: '내 사진으로 눈/코/입/윤곽 워프 + 컨투어/하이라이트/아이라인/립/블러셔 + 헤어스타일 오버레이까지.',
+        docDesc: '내 얼굴 랜드마크 기반 3D 성형 시뮬레이션. 눈/코/입/윤곽 구조 변화를 현실적으로 비교.',
         appTitle: 'AI뷰티시뮬레이터',
         appSubtitle: '— 자연스러운 Before-After 드래그',
         topSub: '✅ 브라우저에서만 처리(서버 업로드 없음) · ✅ 자연스러운 AI 랜드마크 기반 보정 · ✅ 참고용 시뮬레이션',
@@ -763,15 +764,15 @@
         tagBefore: 'BEFORE',
         tagAfter: 'AFTER',
         tipBadge: '팁',
-        tipText: '“강도”를 60~80으로 올리면 훨씬 <b>티</b>가 나고, “헤어 스타일”을 바꾸면 체감이 확 커져요.',
+        tipText: '눈/코/입/윤곽을 낮은 강도부터 조정하면 수술 후 인상을 더 현실적으로 비교할 수 있습니다.',
         lblMirror: '거울',
         lblLandmarks: '랜드마크',
         lblHQ: '고화질',
         lbl3D: '3D 렌더',
         warnTitle: '면책',
         warnBody: '본 서비스는 오락 및 스타일 참고용 시뮬레이션입니다. 실제 시술/수술 결과를 예측하지 않습니다.',
-        controlsTitle: '🎛️ 자연형 AI 뷰티 컨트롤',
-        controlsHint: '형체를 유지하면서 자연스럽게 변화를 주도록 강도를 재설계했습니다.',
+        controlsTitle: '🎛️ 3D 성형 시뮬레이션 컨트롤',
+        controlsHint: '메이크업 효과 없이 얼굴 구조 변화만 반영해 수술 후 인상을 현실적으로 가늠합니다.',
         controlNames: ['전체 강도', '눈 크기', '눈 간격', '코 폭', '코 ‘높아보임’', '입술 볼륨', '턱/윤곽', '피부 보정', '컨투어(쉐딩)', '블러셔', '아이라인', '립 컬러', '립 글로스', '헤어 스타일', '헤어 컬러', '악세서리'],
         controlDescs: ['모든 변형/메이크업/윤곽 효과의 “마스터 게인”', '눈 확대/축소', '눈을 안/밖으로 이동', '콧볼 느낌(가로 워프)', '콧대 하이라이트 + 양옆 쉐딩 강화', '입술 확대/축소', '볼/턱 라인을 중앙으로 핀치(체감 큼)', '얼굴 영역 스무딩 + 톤', '광대/턱/코 옆 쉐딩', '치크 컬러', '윗라인/눈꼬리 강조', '입술 색상', '입술 광(2.5D 체감↑)', '정밀 세그멘테이션 대신 “얼굴 외곽/이마 포인트” 기반으로 그럴듯한 오버레이를 만듭니다(티 많이 남).', '헤어 오버레이 색', '눈/턱 위치 기반 오버레이'],
         hairOptions: ['없음', '앞머리', '단발(보브)', '장발'],
@@ -1689,11 +1690,7 @@
       const lipScale = (Number(lip.value)/100) * (0.16 + 0.30*PWR);
       const slimV = (Number(slim.value)/100) * (0.18 + 0.34*PWR);
 
-      const skinV = (Number(skin.value)/100) * (0.26 + 0.44*PWR);
-      const contourV = (Number(contour.value)/100) * (0.24 + 0.40*PWR);
-      const blushV = (Number(blush.value)/100) * (0.22 + 0.38*PWR);
-      const linerV = (Number(liner.value)/100) * (0.24 + 0.40*PWR);
-      const glossV = (Number(gloss.value)/100) * (0.24 + 0.42*PWR);
+      const contourV = (Number(slim.value)/100) * (0.18 + 0.30*PWR);
       const eyeMid = avg([leftEyeC, rightEyeC]);
       const faceYaw = clamp((noseTip.x - eyeMid.x) / Math.max(1, (rightEyeC.x - leftEyeC.x)), -0.7, 0.7);
 
@@ -1715,12 +1712,7 @@
         });
       }
 
-      // 2) skin
-      if(skinV > 0.001){
-        applySkin(actx, faceOval, skinV, HQ);
-      }
-
-      // 3) Contour + highlight (make it “3D-ish”)
+      // 2) structural depth cue
       if(contourV > 0.001 || noseHV > 0.001){
         applyContourHighlight(actx, {
           faceOval, noseBridge, noseTip,
@@ -1729,37 +1721,11 @@
         });
       }
 
-      // 3.5) pseudo-3D relighting using face orientation (depth cue boost)
+      // 3) pseudo-3D relighting using face orientation (depth cue boost)
       applyPseudo3DVolume(actx, {
         faceOval, leftEyeC, rightEyeC, noseBridge, noseTip, mouthC, chinTip,
         leftCheek, rightCheek, contourV, noseHV, power: PWR, yaw: faceYaw
       });
-
-      // 4) blush
-      if(blushV > 0.001){
-        applyBlush(actx, leftCheek, rightCheek, blushV, HQ);
-      }
-
-      // 5) eyeliner
-      if(linerV > 0.001){
-        applyEyeliner(actx, lm, linerV);
-      }
-
-      // 6) lips color + gloss
-      applyLips(actx, lm, lipColor.value, 0.10 + 0.36*Math.max(0, lipScale+0.10), glossV, HQ);
-
-      // 7) hair overlay
-      if(hairStyle.value !== 'none'){
-        drawHairOverlay(actx, lm, hairStyle.value, hairColor.value, HQ, PWR);
-      }
-
-      // 8) accessories
-      if(glasses.checked) drawGlasses(actx, leftEyeC, rightEyeC);
-      if(earrings.checked){
-        const leftJaw = Pt(234);
-        const rightJaw = Pt(454);
-        drawEarrings(actx, leftJaw, rightJaw, HQ);
-      }
 
       if(chkLandmarks.checked) drawLandmarks(lm, actx);
     }
