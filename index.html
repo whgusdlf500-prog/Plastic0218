@@ -1455,26 +1455,17 @@
       bctx.setTransform(1,0,0,1,0,0);
       bctx.clearRect(0,0,beforeC.width,beforeC.height);
 
-      if(chkMirror.checked){
-        bctx.translate(beforeC.width, 0);
-        bctx.scale(-1, 1);
-      }
-      bctx.drawImage(lastFrameCanvas, 0, 0, beforeC.width, beforeC.height);
+      drawBaseFrame(bctx, lastFrameCanvas, beforeC.width, beforeC.height, chkMirror.checked);
 
       if(chkLandmarks.checked && lastLandmarks){
-        drawLandmarks(lastLandmarks, bctx);
+        drawLandmarks(getWorkingLandmarks(lastLandmarks, chkMirror.checked), bctx);
       }
     }
 
     function renderAfter(){
       actx.setTransform(1,0,0,1,0,0);
       actx.clearRect(0,0,afterC.width,afterC.height);
-
-      if(chkMirror.checked){
-        actx.translate(afterC.width, 0);
-        actx.scale(-1, 1);
-      }
-      actx.drawImage(lastFrameCanvas, 0, 0, afterC.width, afterC.height);
+      drawBaseFrame(actx, lastFrameCanvas, afterC.width, afterC.height, chkMirror.checked);
 
       if(!lastLandmarks){
         return;
@@ -1484,7 +1475,7 @@
       const PWR = Number(power.value) / 100; // 0..1
       const HQ = chkHQ.checked;
 
-      const lm = lastLandmarks;
+      const lm = getWorkingLandmarks(lastLandmarks, chkMirror.checked);
       const W = afterC.width, H = afterC.height;
       const Pt = (i)=>({x: lm[i].x * W, y: lm[i].y * H});
 
@@ -1520,42 +1511,22 @@
       const blushV = (Number(blush.value)/100) * (0.22 + 0.38*PWR);
       const linerV = (Number(liner.value)/100) * (0.24 + 0.40*PWR);
       const glossV = (Number(gloss.value)/100) * (0.24 + 0.42*PWR);
+      const eyeMid = avg([leftEyeC, rightEyeC]);
+      const faceYaw = clamp((noseTip.x - eyeMid.x) / Math.max(1, (rightEyeC.x - leftEyeC.x)), -0.7, 0.7);
 
-      // 1) skin (stronger)
+      // 1) Landmark-guided local liquify (less identity break than region scaling)
+      applyLandmarkLiquify(actx, {
+        leftEyeC, rightEyeC, mouthC, noseTip,
+        leftCheek, rightCheek, leftJawMid, rightJawMid, chinTip,
+        eyeScale, eyeSpaceV, noseWV, lipScale, slimV, faceYaw, power: PWR
+      });
+
+      // 2) skin
       if(skinV > 0.001){
         applySkin(actx, faceOval, skinV, HQ);
       }
 
-      // 2) Slim pinch (the most “티 남”)
-      if(slimV > 0.001){
-        softPinch(actx, leftCheek,   280, 390, slimV*0.22, +1, HQ);
-        softPinch(actx, rightCheek,  280, 390, slimV*0.22, -1, HQ);
-        softPinch(actx, leftJawMid,  250, 340, slimV*0.25, +1, HQ);
-        softPinch(actx, rightJawMid, 250, 340, slimV*0.25, -1, HQ);
-        softPinch(actx, chinTip, 300, 260, slimV*0.12, 0, HQ);
-      }
-
-      // 3) eyes (spacing + scaling)
-      if(Math.abs(eyeSpaceV) > 0.001){
-        shiftRegion(actx, leftEyeC,  210, 150, -eyeSpaceV*42);
-        shiftRegion(actx, rightEyeC, 210, 150, +eyeSpaceV*42);
-      }
-      if(Math.abs(eyeScale) > 0.001){
-        regionScale(actx, leftEyeC,  210, 150, 1 + eyeScale, 1 + eyeScale*0.62);
-        regionScale(actx, rightEyeC, 210, 150, 1 + eyeScale, 1 + eyeScale*0.62);
-      }
-
-      // 4) nose width (narrow/widen)
-      if(Math.abs(noseWV) > 0.001){
-        regionScale(actx, noseTip,  220, 280, 1 + noseWV, 1);
-      }
-
-      // 5) lips
-      if(Math.abs(lipScale) > 0.001){
-        regionScale(actx, mouthC, 310, 190, 1 + lipScale, 1 + lipScale*0.45);
-      }
-
-      // 6) Contour + highlight (make it “3D-ish”)
+      // 3) Contour + highlight (make it “3D-ish”)
       if(contourV > 0.001 || noseHV > 0.001){
         applyContourHighlight(actx, {
           faceOval, noseBridge, noseTip,
@@ -1564,25 +1535,31 @@
         });
       }
 
-      // 7) blush
+      // 3.5) pseudo-3D relighting using face orientation (depth cue boost)
+      applyPseudo3DVolume(actx, {
+        faceOval, leftEyeC, rightEyeC, noseBridge, noseTip, mouthC, chinTip,
+        leftCheek, rightCheek, contourV, noseHV, power: PWR, yaw: faceYaw
+      });
+
+      // 4) blush
       if(blushV > 0.001){
         applyBlush(actx, leftCheek, rightCheek, blushV, HQ);
       }
 
-      // 8) eyeliner
+      // 5) eyeliner
       if(linerV > 0.001){
         applyEyeliner(actx, lm, linerV);
       }
 
-      // 9) lips color + gloss
+      // 6) lips color + gloss
       applyLips(actx, lm, lipColor.value, 0.10 + 0.36*Math.max(0, lipScale+0.10), glossV, HQ);
 
-      // 10) hair overlay
+      // 7) hair overlay
       if(hairStyle.value !== 'none'){
         drawHairOverlay(actx, lm, hairStyle.value, hairColor.value, HQ, PWR);
       }
 
-      // 11) accessories
+      // 8) accessories
       if(glasses.checked) drawGlasses(actx, leftEyeC, rightEyeC);
       if(earrings.checked){
         const leftJaw = Pt(234);
@@ -1640,6 +1617,101 @@
       ctx.setTransform(1,0,0,1,0,0);
       ctx.clearRect(0,0,cw,ch);
       ctx.drawImage(media, dx, dy, dw, dh);
+    }
+
+    function drawBaseFrame(ctx, frame, width, height, mirror){
+      ctx.setTransform(1,0,0,1,0,0);
+      if(mirror){
+        ctx.save();
+        ctx.translate(width, 0);
+        ctx.scale(-1, 1);
+        ctx.drawImage(frame, 0, 0, width, height);
+        ctx.restore();
+      }else{
+        ctx.drawImage(frame, 0, 0, width, height);
+      }
+    }
+
+    function getWorkingLandmarks(lm, mirror){
+      if(!mirror || !lm) return lm;
+      const out = new Array(lm.length);
+      for(let i=0;i<lm.length;i++){
+        out[i] = {x: 1 - lm[i].x, y: lm[i].y, z: lm[i].z};
+      }
+      return out;
+    }
+
+    function applyLandmarkLiquify(ctx, cfg){
+      // Conservative landmark warp to preserve identity.
+      const {
+        leftEyeC, rightEyeC, mouthC, noseTip,
+        leftCheek, rightCheek, leftJawMid, rightJawMid, chinTip,
+        eyeScale, eyeSpaceV, noseWV, lipScale, slimV, faceYaw=0, power=0.5
+      } = cfg;
+
+      const base = 0.75 + power*0.20;
+      const eyeGain = eyeScale * 0.24 * base;
+      const leftWeight = clamp(1 - faceYaw*0.35, 0.72, 1.20);
+      const rightWeight = clamp(1 + faceYaw*0.35, 0.72, 1.20);
+      if(Math.abs(eyeSpaceV) > 0.0005){
+        shiftRegion(ctx, leftEyeC, 150, 110, -eyeSpaceV*16);
+        shiftRegion(ctx, rightEyeC, 150, 110, +eyeSpaceV*16);
+      }
+      if(Math.abs(eyeGain) > 0.0005){
+        regionScale(ctx, leftEyeC, 150, 110, 1 + eyeGain*leftWeight, 1 + eyeGain*0.40*leftWeight);
+        regionScale(ctx, rightEyeC, 150, 110, 1 + eyeGain*rightWeight, 1 + eyeGain*0.40*rightWeight);
+      }
+
+      if(Math.abs(noseWV) > 0.0005){
+        regionScale(ctx, noseTip, 150, 210, 1 + (noseWV*0.40*base), 1);
+      }
+
+      if(Math.abs(lipScale) > 0.0005){
+        regionScale(ctx, mouthC, 210, 125, 1 + (lipScale*0.30*base), 1 + (lipScale*0.20*base));
+      }
+
+      if(Math.abs(slimV) > 0.0005){
+        softPinch(ctx, leftCheek,   170, 210, slimV*0.11*leftWeight, +1, false);
+        softPinch(ctx, rightCheek,  170, 210, slimV*0.11*rightWeight, -1, false);
+        softPinch(ctx, leftJawMid,  150, 180, slimV*0.12*leftWeight, +1, false);
+        softPinch(ctx, rightJawMid, 150, 180, slimV*0.12*rightWeight, -1, false);
+        softPinch(ctx, chinTip, 190, 150, slimV*0.06*base, 0, false);
+      }
+    }
+
+    function applyPseudo3DVolume(ctx, cfg){
+      const {faceOval, leftEyeC, rightEyeC, noseBridge, noseTip, mouthC, chinTip, leftCheek, rightCheek, contourV, noseHV, power, yaw} = cfg;
+      const W = ctx.canvas.width;
+      const lightX = yaw >= 0 ? -1 : 1; // opposite side gets softer light
+      const lightBias = 0.5 + Math.abs(yaw)*0.6;
+
+      ctx.save();
+      polygonClip(ctx, faceOval);
+
+      // Soft global relight: highlight forehead/bridge and subtle chin/cheek occlusion.
+      const bridgeAlpha = (0.06 + noseHV*0.14) * (0.8 + power*0.5);
+      ctx.globalAlpha = bridgeAlpha;
+      radialGlow(ctx, noseBridge.x - 14*lightX, noseBridge.y - 26, 130, "rgba(255,255,255,0.26)");
+      radialGlow(ctx, noseTip.x - 7*lightX, noseTip.y - 4, 80, "rgba(255,255,255,0.20)");
+
+      const cheekShadow = (0.05 + contourV*0.12) * (0.7 + lightBias*0.4);
+      ctx.globalAlpha = cheekShadow;
+      radialGlow(ctx, leftCheek.x - 44, leftCheek.y + 28, 180, "rgba(22,13,16,0.42)");
+      radialGlow(ctx, rightCheek.x + 44, rightCheek.y + 28, 180, "rgba(22,13,16,0.42)");
+
+      ctx.globalAlpha = 0.05 + contourV*0.10;
+      radialGlow(ctx, chinTip.x, chinTip.y + 30, 170, "rgba(28,16,20,0.40)");
+
+      // Eye socket depth and philtrum highlight increase 3D perception without changing identity.
+      ctx.globalAlpha = 0.04 + contourV*0.08;
+      radialGlow(ctx, leftEyeC.x, leftEyeC.y + 16, 90, "rgba(20,12,15,0.35)");
+      radialGlow(ctx, rightEyeC.x, rightEyeC.y + 16, 90, "rgba(20,12,15,0.35)");
+
+      ctx.globalAlpha = 0.05 + noseHV*0.12;
+      radialGlow(ctx, mouthC.x, mouthC.y - 18, 70, "rgba(255,255,255,0.18)");
+
+      ctx.restore();
+      ctx.globalAlpha = 1;
     }
 
     function avg(points){
